@@ -1,4 +1,4 @@
-package hello;
+package de.phigroup.websocket.monitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Controller;
 
-import com.lhsystems.monitoring.dto.Lines;
+import de.phigroup.websocket.monitor.dto.Lines;
 
 @Controller
 public class CommandExecutor {

@@ -1,4 +1,4 @@
-package com.lhsystems.websocket.client;
+package de.phigroup.websocket.client;
 
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;

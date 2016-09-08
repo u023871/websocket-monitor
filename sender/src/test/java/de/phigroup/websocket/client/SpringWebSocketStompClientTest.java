@@ -1,4 +1,4 @@
-package com.lhsystems.websocket.client;
+package de.phigroup.websocket.client;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -15,10 +15,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.ListenableFuture;
 
-import com.lhsystems.http.client.SpringHttpClient;
-import com.lhsystems.monitoring.dto.SigarSystemStats;
-import com.lhsystems.websocket.client.SpringWebSocketStompClient;
-
+import de.phigroup.http.client.SpringHttpClient;
+import de.phigroup.websocket.client.SpringWebSocketStompClient;
+import de.phigroup.websocket.monitor.dto.SigarSystemStats;
 import lombok.extern.slf4j.Slf4j;
 
 /**

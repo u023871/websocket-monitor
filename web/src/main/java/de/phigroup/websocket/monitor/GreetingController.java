@@ -1,4 +1,4 @@
-package hello;
+package de.phigroup.websocket.monitor;
 
 import java.io.BufferedReader;
 import java.io.IOException;

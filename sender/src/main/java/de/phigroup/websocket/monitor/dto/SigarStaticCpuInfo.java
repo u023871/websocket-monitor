@@ -1,4 +1,4 @@
-package com.lhsystems.monitoring.dto;
+package de.phigroup.websocket.monitor.dto;
 
 import lombok.Data;
 

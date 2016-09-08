@@ -1,4 +1,4 @@
-package com.lhsystems.websocket.client;
+package de.phigroup.websocket.client;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -25,10 +25,10 @@ import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lhsystems.monitoring.dto.Greeting;
-import com.lhsystems.monitoring.dto.SigarSystemStats;
-import com.lhsystems.websocket.MyStompSessionHandler;
 
+import de.phigroup.websocket.MyStompSessionHandler;
+import de.phigroup.websocket.monitor.dto.Greeting;
+import de.phigroup.websocket.monitor.dto.SigarSystemStats;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

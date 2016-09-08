@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.lhsystems.http.client;
+package de.phigroup.http.client;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

@@ -1,4 +1,4 @@
-package hello;
+package de.phigroup.websocket.monitor;
 
 import lombok.Data;
 
