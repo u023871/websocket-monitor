@@ -131,7 +131,8 @@
 
 				updateLight(cpuPercCombined, 'cpuPercCombined');
 				updateLight(memPercUsed, 'memPercUsed');
-				updateLight(uptime, 'uptime');
+				
+				updateValue(uptime, 'uptime');
 				
 				var cpuStatsStatic = JSON.parse(statusSystem.body).staticCpuInfo;
 				showStaticCpuStats(cpuStatsStatic);
@@ -185,8 +186,6 @@
 	
 	function writeCpuLine(cpu, index) {
 		
-// 		$("#debug").append("writeCpuLine " + index + "\n");
-		
 		var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow');
 		var dynamicCpuRowNode = dynamicCpuRowNodeOrig;
 
@@ -202,32 +201,21 @@
 		var dynamicCpuTableNode = document.getElementById('dynamicCpuTable');
 		
 		var divTags = dynamicCpuRowNodeClone.getElementsByTagName('div');
-//  		$("#debug").append("divTags " + divTags.length + "\n");
-//  		$("#debug").append("childnodes " + dynamicCpuRowNodeClone.childNodes.length + "\n");
-//  		$("#debug").append("childnodes orig " + dynamicCpuRowNode.childNodes.length + "\n");
 
 		for(var i=0; i<divTags.length; i++) {
 			
 			var divElement = divTags[i];
 			
-// 			$("#debug").append("divElement: " + divElement + "\n");
-			
 			var id = divElement.id;
-			
-// 			$("#debug").append("divElement id before: " + id + "\n");
 			
 			if(id != null) {
 				
 				divElement.id = id + index;
 				
 			}
-// 			$("#debug").append("divElement.id after: " + divElement.id + "\n");
 		}
 		
-// 		$("#debug").append("dynamicCpuRowNodeClone: " + dynamicCpuRowNodeClone + "\n");
 		if(dynamicCpuRowNodeClone != null) {
-
-// 			$("#debug").append("dynamicCpuRowNodeClone: " + dynamicCpuRowNodeClone + "\n");
 			
 			dynamicCpuRowNodeClone.id = 'dynamicCpuRow' + index;
 			
@@ -237,18 +225,12 @@
 			    dynamicCpuRowNodeClone.classList.remove('hidden');
 			}
 			
-// 			$("#debug").append("dynamicCpuRowNodeClone.id: " + dynamicCpuRowNodeClone.id + "\n");
-
-	
 		}
 
-		$("#debug").append("TEST\n");
 	    for (var key in cpu) {
 	    	
 	        var elementName = key;
 	        var value = cpu[key];
-	        
-//		        var valueNode = document.getElementById(elementName + index);
 	        
 	        if(elementName.lastIndexOf('Perc') > -1) {
 	        	
@@ -261,24 +243,61 @@
 	        
 	        replaceValue(value, elementName + index);
 	        
-//		        document.write("<br> - " + attrName + ": " + attrValue);
 	    }
 		
-// 		node.replaceChild(document.createTextNode(value), node.childNodes[0]);
 	}
 	
 	function replaceValue(value, nodeName) {
 		
 		var node = document.getElementById(nodeName);
 
-// 		$("#debug").append("value: " + value + ", nodeName: " + nodeName + ", node: " + node +"\n");
-		
 		if(node != null) {
 			
 			node.replaceChild(document.createTextNode(value), node.childNodes[0]);
 		}
 	}
-	
+
+	function updateValue(value, elementNamePrefix) {
+		
+		var elementStatusBox = document.getElementById(elementNamePrefix);
+
+		if (elementNamePrefix == 'uptime') {
+			
+			value = 100;
+			
+			if(value != null && value > 0) {
+				
+ 				elementStatusBox.classList.add('lightGreen');
+			} else {
+				
+				value = 'NO DATA';
+ 				elementStatusBox.classList.add('lightInactive');
+			}
+			
+			if(typeof value == 'number') {
+				
+				value = $.format.number(value, '##0.00');
+			}
+
+		}
+
+		if (value != null) {
+
+			// debug only
+			var elementDebug = document.getElementById('debug');
+			var emptyTextNode = document.createTextNode('');
+			elementDebug.replaceChild(emptyTextNode, elementDebug.childNodes[0]);
+			elementDebug.classList.remove('hidden');
+
+			// make visible
+			elementStatusBox.classList.remove('hidden');
+		}
+
+		var newValueTextNode = document.createTextNode(value);
+
+		elementStatusBox.replaceChild(newValueTextNode, elementStatusBox.childNodes[0]);
+	}
+
 	/**
 	 * update system status red/green/yellow
 	 */
@@ -307,37 +326,24 @@
 		elementStatusBox.classList.remove('lightYellow');
 		elementStatusBox.classList.remove('lightInactive');
 
-		if (elementNamePrefix == 'uptime') {
+		
+		if (value > 66) {
 			
-			if(value != null && value > 0) {
-				
-				elementStatusBox.classList.add('lightGreen');
-			} else {
-				
-				value = 'NO DATA';
-				elementStatusBox.classList.add('lightInactive');
-			}
+			elementStatusBox.classList.add('lightRed');
+		} else if (value <= 66 && value > 33) {
+			
+			elementStatusBox.classList.add('lightYellow');
+		} else if (value <= 33 && value >= 0) {
+			
+			elementStatusBox.classList.add('lightGreen');
 		} else {
 			
-			if (value > 66) {
-				
-				elementStatusBox.classList.add('lightRed');
-			} else if (value <= 66 && value > 33) {
-				
-				elementStatusBox.classList.add('lightYellow');
-			} else if (value <= 33 && value >= 0) {
-				
-				elementStatusBox.classList.add('lightGreen');
-			} else {
-				
-				elementStatusBox.classList.add('lightInactive');
-			}
+			elementStatusBox.classList.add('lightInactive');
 		}
 
 		if(typeof value == 'number') {
 			
 			value = $.format.number(value, '##0.00');
-		} else {
 		}
 
 		var newValueTextNode = document.createTextNode(value);
@@ -377,12 +383,16 @@
 					<div class="lightTitle">Memory<br/>Utilization</div>
 					<div id="memPercUsedLight" class="lightValue">NO DATA</div>
 				</div>
-				<div id="uptime" class="cell lightInactive circle">
-					<div class="lightTitle">Uptime</div>
-					<div id="uptimeLight" class="lightValue">NO DATA</div>
-				</div>
 			</div>
 		</div>
+		<div class="table">
+			<div class="row">CPU Uptime</div>
+			<div class="row">
+				<div id="uptime" class="lightValue" class="cell lightInactive">
+					NO DATA
+				</div>
+			</div>
+		</div>		
 		<div class="table">
 			<div class="row">CPU (Static)</div>
 			<div id="staticCpu" class="row">
