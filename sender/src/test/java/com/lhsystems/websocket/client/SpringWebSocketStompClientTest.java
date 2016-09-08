@@ -1,4 +1,4 @@
-package com.lhsystems.http.client;
+package com.lhsystems.websocket.client;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import com.lhsystems.http.client.SpringHttpClient;
 import com.lhsystems.monitoring.dto.SigarSystemStats;
 import com.lhsystems.websocket.client.SpringWebSocketStompClient;
 
@@ -48,7 +49,7 @@ public class SpringWebSocketStompClientTest {
 		 * Test Sigar stuff with -Djava.library.path="D:\DEV\Workspaces\Spring\gs-messaging-stomp-websocket\stomp-websocket-client\src\main\resources\sigar\lib",
 		 * see http://stackoverflow.com/questions/11612711/sigar-unsatisfiedlinkerror!
 		 */
-		System.setProperty("java.library.path", "C:\\development\\Workspaces\\Spring\\gs-messaging-stomp-websocket\\stomp-websocket-client\\src\\main\\resources\\sigar\\lib");
+		System.setProperty("java.library.path", "C:\\development\\Workspaces\\Spring\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
 	}
 
 	/**
