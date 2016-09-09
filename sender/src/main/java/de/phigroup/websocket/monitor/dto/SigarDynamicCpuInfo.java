@@ -8,20 +8,23 @@ import lombok.Data;
 @Data
 public class SigarDynamicCpuInfo {
 	
-	long idle, irq, nice, softIrq, stolen, sys, total, user, wait;
+	long idleTime, irqTime, niceTime, softIrqTime, stolenTime, sysTime, totalTime, userTime, waitTime;
 	double idlePerc, irqPerc, nicePerc, softIrqPerc, stolenPerc, sysPerc, combinedPerc, userPerc, waitPerc;
+	int cpuNumber;
 	
-	public void fill(Cpu cpu, CpuPerc cpuPerc) {
+	public void fill(Cpu cpu, CpuPerc cpuPerc, int cpuNumber) {
 		
-		idle = cpu.getIdle(); // Get the Total system cpu idle time.
-		irq = cpu.getIrq(); // Get the Total system cpu time servicing interrupts.
-		nice = cpu.getNice(); // Get the Total system cpu nice time.
-		softIrq = cpu.getSoftIrq(); // Get the Total system cpu time servicing softirqs.
-		stolen = cpu.getStolen(); // Get the Total system cpu involuntary wait time.
-		sys = cpu.getSys(); // Get the Total system cpu kernel time.
-		total = cpu.getTotal(); // Get the Total system cpu time.
-		user = cpu.getUser(); // Get the Total system cpu user time.
-		wait = cpu.getWait(); // Get the Total system cpu io wait time.
+		this.cpuNumber = cpuNumber;
+		
+		idleTime = cpu.getIdle(); // Get the Total system cpu idle time.
+		irqTime = cpu.getIrq(); // Get the Total system cpu time servicing interrupts.
+		niceTime = cpu.getNice(); // Get the Total system cpu nice time.
+		softIrqTime = cpu.getSoftIrq(); // Get the Total system cpu time servicing softirqs.
+		stolenTime = cpu.getStolen(); // Get the Total system cpu involuntary wait time.
+		sysTime = cpu.getSys(); // Get the Total system cpu kernel time.
+		totalTime = cpu.getTotal(); // Get the Total system cpu time.
+		userTime = cpu.getUser(); // Get the Total system cpu user time.
+		waitTime = cpu.getWait(); // Get the Total system cpu io wait time.
 		
 		idlePerc = cpuPerc.getIdle();
 		irqPerc = cpuPerc.getIrq();

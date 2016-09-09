@@ -16,7 +16,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import de.phigroup.http.client.SpringHttpClient;
-import de.phigroup.websocket.client.SpringWebSocketStompClient;
 import de.phigroup.websocket.monitor.dto.SigarSystemStats;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:applicationContext.xml" })
 public class SpringWebSocketStompClientTest {
-
+	
 	@Autowired
 	private SpringHttpClient client;
 
@@ -50,7 +49,7 @@ public class SpringWebSocketStompClientTest {
 		 */
 		System.setProperty("java.library.path", "C:\\development\\Workspaces\\Spring\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
 	}
-
+	
 	/**
 	 * See
 	 * http://databasefaq.com/index.php/answer/69808/java-spring-spring-websocket-websocketstompclient-wont-connect-to-sockjs-endpoint

@@ -52,8 +52,8 @@
 
 .circle {
 	position: relative;
-	width: 150px;
-	height: 150px;
+	width: 120px;
+	height: 120px;
 	border: 1px solid black;
 	text-align: center;
 	border-radius: 150px;
@@ -65,7 +65,12 @@
 }
 
 .lightValue {
-	font-size: 24px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.lightValue {
+	font-size: 16px;
 	font-weight: bold;
 }
 
@@ -86,6 +91,17 @@
 	border: 1px solid black;
 	padding:5px;
 }
+
+.cellSimple {
+	display: table-cell;
+}
+
+.cellValue {
+	font-size: 12px;
+	font-weight: bold;
+}
+
+
 </style>
 
 <script type="text/javascript">
@@ -141,11 +157,6 @@
 				showDynamicCpuStats(cpuStatsDyn);
 				dynCpuStatsWritten = 1;
 				
-				var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow');
-				if(dynamicCpuRowNodeOrig != null) {
-					
-					dynamicCpuRowNodeOrig.outerHTML = "";
-				}
 			});
 		});
 	}
@@ -171,34 +182,63 @@
 		replaceValue(cpuStats.cpuVendor, 'cpuVendor');
 	}
 	
-
 	function showDynamicCpuStats(cpuStats) {
 		
 		if(cpuStats != null) {
 			
+			//
+			// CPU util. percentages
+			//
+			
 			for (var i = 0; i < cpuStats.length; i++){
 				
-				writeCpuLine(cpuStats[i], i);
+				writeDynamicCpuLine(cpuStats[i], i, 'Perc');
+			}
+
+			var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRowPerc');
+			if(dynamicCpuRowNodeOrig != null) {
+				
+				dynamicCpuRowNodeOrig.outerHTML = "";
+			}
+
+			//
+			// CPU util. times
+			//
+			
+			for (var i = 0; i < cpuStats.length; i++){
+				
+				writeDynamicCpuLine(cpuStats[i], i, 'Times');
+			}
+			
+			dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRowTimes');
+			if(dynamicCpuRowNodeOrig != null) {
+				
+				dynamicCpuRowNodeOrig.outerHTML = "";
 			}
 		}
 
 	}
 	
-	function writeCpuLine(cpu, index) {
+	/**
+	 * cpu: dyn. CPU json data object
+     * index: CPU index 
+	 * suffix: dynamicCpuRow id suffix, e.g. Perc
+	 */
+	function writeDynamicCpuLine(cpu, index, suffix) {
 		
-		var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow');
+		var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow' + suffix);
 		var dynamicCpuRowNode = dynamicCpuRowNodeOrig;
 
 		if(dynamicCpuRowNode == null) {
 			
-			dynamicCpuRowNode = document.getElementById('dynamicCpuRow' + index);
+			dynamicCpuRowNode = document.getElementById('dynamicCpuRow' + suffix + index);
 		} else {
 			
 		}
 
 		var dynamicCpuRowNodeClone = dynamicCpuRowNode.cloneNode(true);
 
-		var dynamicCpuTableNode = document.getElementById('dynamicCpuTable');
+		var dynamicCpuTableNode = document.getElementById('dynamicCpuTable' + suffix);
 		
 		var divTags = dynamicCpuRowNodeClone.getElementsByTagName('div');
 
@@ -217,7 +257,7 @@
 		
 		if(dynamicCpuRowNodeClone != null) {
 			
-			dynamicCpuRowNodeClone.id = 'dynamicCpuRow' + index;
+			dynamicCpuRowNodeClone.id = 'dynamicCpuRow' + suffix + index;
 			
 			if(dynCpuStatsWritten == 0) {
 				
@@ -240,6 +280,10 @@
 	        	
 	        	value = $.format.number(value / 60 / 60, '##0.00');
 	        }
+	        else if(elementName.lastIndexOf('cpuNumber') > -1) {
+	        	
+	        	$("#debug").append("suffix: " + suffix + ", value: " + value + "\n");
+	        }
 	        
 	        replaceValue(value, elementName + index);
 	        
@@ -261,17 +305,14 @@
 		
 		var elementStatusBox = document.getElementById(elementNamePrefix);
 
+		// uptime
 		if (elementNamePrefix == 'uptime') {
-			
-			value = 100;
 			
 			if(value != null && value > 0) {
 				
- 				elementStatusBox.classList.add('lightGreen');
 			} else {
 				
 				value = 'NO DATA';
- 				elementStatusBox.classList.add('lightInactive');
 			}
 			
 			if(typeof value == 'number') {
@@ -379,6 +420,8 @@
 					<div class="lightTitle">CPU<br/>Utilization</div>
 					<div id="cpuPercCombinedLight" class="lightValue">NO DATA</div>
 				</div>
+				<div class="cellSimple" style="padding:5px;">
+				</div>
 				<div id="memPercUsed" class="cell lightInactive circle">
 					<div class="lightTitle">Memory<br/>Utilization</div>
 					<div id="memPercUsedLight" class="lightValue">NO DATA</div>
@@ -386,9 +429,9 @@
 			</div>
 		</div>
 		<div class="table">
-			<div class="row">CPU Uptime</div>
 			<div class="row">
-				<div id="uptime" class="lightValue" class="cell lightInactive">
+				<div class="cellSimple">CPU Uptime: </div>
+				<div id="uptime" class="cellValue" class="cell lightInactive">
 					NO DATA
 				</div>
 			</div>
@@ -398,73 +441,158 @@
 			<div id="staticCpu" class="row">
 				<div class="cell lightInactive">
 					<div class="lightTitle">Vendor</div>
-					<div id="cpuVendor" class="lightValue">NO DATA</div>
+					<div id="cpuVendor" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">Model</div>
-					<div id="cpuModel" class="lightValue">NO DATA</div>
+					<div id="cpuModel" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">Frequency</div>
-					<div id="cpuMhz" class="lightValue">NO DATA</div>
+					<div id="cpuMhz" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">Total Cores</div>
-					<div id="cpuTotalCores" class="lightValue">NO DATA</div>
+					<div id="cpuTotalCores" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">Cache Size</div>
-					<div id="cpuCacheSize" class="lightValue">NO DATA</div>
+					<div id="cpuCacheSize" class="cellValue">NO DATA</div>
 				</div>
 			</div>
 		</div>
-		<div id="dynamicCpuTable" class="table">
-			<div class="row">CPU (Dynamic times / %)</div>
-			<div id="dynamicCpuRow" class="row hidden">
+		<div id="dynamicCpuTablePerc" class="table">
+			<div class="row">CPU (Dynamic %)</div>
+			<div class="row">
+				<div class="cell lightInactive">
+					<div class="lightTitle">CPU #</div>
+				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">Idle</div>
-					<div id="idleTime" class="lightValue">NO DATA</div>
-					<div id="idlePerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">SYS</div>
-					<div id="sysTime" class="lightValue">NO DATA</div>
-					<div id="sysPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">TOTAL/COMBINED</div>
-					<div id="totalTime" class="lightValue">NO DATA</div>
-					<div id="combinedPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">USER</div>
-					<div id="userTime" class="lightValue">NO DATA</div>
-					<div id="userPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">WAIT</div>
-					<div id="waitTime" class="lightValue">NO DATA</div>
-					<div id="waitPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">IRQ</div>
-					<div id="irqTime" class="lightValue">NO DATA</div>
-					<div id="irqPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">NICE</div>
-					<div id="niceTime" class="lightValue">NO DATA</div>
-					<div id="nicePerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">SOFT IRQ</div>
-					<div id="softIrqTime" class="lightValue">NO DATA</div>
-					<div id="softIrqPerc" class="lightValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div class="lightTitle">STOLEN</div>
-					<div id="stolenTime" class="lightValue">NO DATA</div>
-					<div id="stolenPerc" class="lightValue">NO DATA</div>
+				</div>
+			</div>			
+			<div id="dynamicCpuRowPerc" class="row hidden">
+				<div class="cell lightInactive">
+					<div id="cpuNumber" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="idlePerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="sysPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="combinedPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="userPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="waitPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="irqPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="nicePerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="softIrqPerc" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="stolenPerc" class="cellValue">NO DATA</div>
+				</div>
+			</div>
+		</div>
+			
+		<div id="dynamicCpuTableTimes" class="table">
+			<div class="row">CPU (Dynamic times)</div>
+			<div class="row">
+				<div class="cell lightInactive">
+					<div class="lightTitle">CPU #</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Idle</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">SYS</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">TOTAL/COMBINED</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">USER</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">WAIT</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">IRQ</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">NICE</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">SOFT IRQ</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">STOLEN</div>
+				</div>
+			</div>
+			<div id="dynamicCpuRowTimes" class="row hidden">
+				<div class="cell lightInactive">
+					<div id="cpuNumber" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="idleTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="sysTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="totalTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="userTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="waitTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="irqTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="niceTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="softIrqTime" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="stolenTime" class="cellValue">NO DATA</div>
 				</div>
 			</div>
 		</div>

@@ -82,7 +82,7 @@ public class SigarSystemStats {
 	    	}
 	    	
 	    	SigarDynamicCpuInfo dyn = new SigarDynamicCpuInfo();
-	    	dyn.fill(cpu, cpuPerc);
+	    	dyn.fill(cpu, cpuPerc, i);
 	    	
 	    	stats.dynamicCpuInfos.add(dyn);
 		}
