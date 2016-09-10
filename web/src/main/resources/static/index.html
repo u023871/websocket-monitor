@@ -105,8 +105,10 @@
 </style>
 
 <script type="text/javascript">
+
 	var stompClient = null;
-	var dynCpuStatsWritten = 0;
+	var dynCpuStatsWritten = false;
+	var staticSystemStatsWritten = false;
 
 	function setConnected(connected) {
 		
@@ -142,6 +144,8 @@
 				
 				var sysStatsStatic = JSON.parse(staticSystemStatus.body).staticSystemInfo;
 				showStaticSystemStats(sysStatsStatic);
+				
+				staticSystemStatsWritten = true;
 			});
 			
 			// subscribe dynamic system status broker
@@ -158,7 +162,8 @@
 				
 				var cpuStatsDyn = JSON.parse(dynamicSystemStatus.body).dynamicCpuInfos;
 				showDynamicCpuStats(cpuStatsDyn);
-				dynCpuStatsWritten = 1;
+				
+				dynCpuStatsWritten = true;
 			});
 		});
 	}
@@ -195,9 +200,27 @@
 	 */
 	function showStaticSystemStats(sysStats) {
 		
-		replaceValue(sysStats.fqdn, 'fqdn');
-		
-		
+		if(sysStats != null) {
+			
+			// FQDN
+			replaceValue(sysStats.fqdn, 'fqdn');
+			
+			// static file system info
+			if(sysStats.staticFileSystemInfos != null) {
+
+				for (var i = 0; i < sysStats.staticFileSystemInfos.length; i++){
+					
+					writeTableRow(sysStats.staticFileSystemInfos[i], i, "", "staticFileSystemRow", "staticFileSystemTable", staticSystemStatsWritten);
+				}
+
+				// ensure to remove template row
+				var staticFileSystemRowNode = document.getElementById("staticFileSystemRow");
+				if(staticFileSystemRowNode != null) {
+					
+					staticFileSystemRowNode.outerHTML = "";
+				}
+			}
+		}
 	}
 	
 	/**
@@ -213,9 +236,10 @@
 			
 			for (var i = 0; i < cpuStats.length; i++){
 				
-				writeDynamicCpuLine(cpuStats[i], i, 'Perc');
+				writeTableRow(cpuStats[i], i, 'Perc', 'dynamicCpuRow', 'dynamicCpuTable', dynCpuStatsWritten);
 			}
 
+			// ensure to remove template row
 			var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRowPerc');
 			if(dynamicCpuRowNodeOrig != null) {
 				
@@ -228,9 +252,10 @@
 			
 			for (var i = 0; i < cpuStats.length; i++){
 				
-				writeDynamicCpuLine(cpuStats[i], i, 'Times');
+				writeTableRow(cpuStats[i], i, 'Times', 'dynamicCpuRow', 'dynamicCpuTable', dynCpuStatsWritten);
 			}
 			
+			// ensure to remove template row
 			dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRowTimes');
 			if(dynamicCpuRowNodeOrig != null) {
 				
@@ -245,52 +270,54 @@
      * index: CPU index 
 	 * suffix: dynamicCpuRow id suffix, e.g. Perc
 	 */
-	function writeDynamicCpuLine(cpuStats, index, suffix) {
+	function writeTableRow(rowBean, index, suffix, rowElementName, tableElementName, rowTemplateCloneAlreadyAppendedAndUnhidden) {
 		
-		var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow' + suffix);
+		 
+		var dynamicCpuRowNodeOrig = document.getElementById(rowElementName + suffix);
 		var dynamicCpuRowNode = dynamicCpuRowNodeOrig;
 
 		if(dynamicCpuRowNode == null) {
 			
-			dynamicCpuRowNode = document.getElementById('dynamicCpuRow' + suffix + index);
-		} else {
-			
+			dynamicCpuRowNode = document.getElementById(rowElementName + suffix + index);
 		}
 
 		var dynamicCpuRowNodeClone = dynamicCpuRowNode.cloneNode(true);
 
-		var dynamicCpuTableNode = document.getElementById('dynamicCpuTable' + suffix);
+		var dynamicCpuTableNode = document.getElementById(tableElementName + suffix);
 		
 		var divTags = dynamicCpuRowNodeClone.getElementsByTagName('div');
 
+		// iterate all div tags and append index to them
 		for(var i=0; i<divTags.length; i++) {
 			
 			var divElement = divTags[i];
 			
 			var id = divElement.id;
 			
-			if(id != null) {
+			if(id != null && '' != id) {
 				
 				divElement.id = id + index;
-				
 			}
 		}
 		
 		if(dynamicCpuRowNodeClone != null) {
 			
-			dynamicCpuRowNodeClone.id = 'dynamicCpuRow' + suffix + index;
-			
-			if(dynCpuStatsWritten == 0) {
+			// set new id to clone
+			dynamicCpuRowNodeClone.id = rowElementName + suffix + index;
+		
+			// unhide and append clone if row has not yet been rendered before
+			if(!rowTemplateCloneAlreadyAppendedAndUnhidden) {
 				
 			    dynamicCpuTableNode.appendChild(dynamicCpuRowNodeClone);
 			    dynamicCpuRowNodeClone.classList.remove('hidden');
 			}
 		}
 
-	    for (var key in cpuStats) {
+		// replace all elements' values matching bean property names
+	    for (var key in rowBean) {
 	    	
 	        var elementName = key;
-	        var value = cpuStats[key];
+	        var value = rowBean[key];
 	        
 	        if(elementName.lastIndexOf('Perc') > -1) {
 	        	
@@ -302,8 +329,6 @@
 	        }
 	        else if(elementName.lastIndexOf('cpuNumber') > -1) {
 	        	
-// 	        	$("#debug").append("suffix: " + suffix + ", value: " + value + "\n");
-
 				// as we reuse the "cpuNumber" element in different tables, add a suffix
 	        	elementName = elementName + suffix;
 	        }
@@ -645,7 +670,7 @@
 		<div class="table">
 			<div class="row">File system (static)</div>
 		</div>
-		<div id="staticFileSystemInfoTable" class="table">
+		<div id="staticFileSystemTable" class="table">
 			<div class="row">
 				<div class="cell lightInactive">
 					<div class="lightTitle">Dev name</div>

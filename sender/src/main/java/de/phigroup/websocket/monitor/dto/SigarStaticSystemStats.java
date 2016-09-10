@@ -32,8 +32,6 @@ import lombok.Data;
 @Data
 public class SigarStaticSystemStats {
 
-	double cpuPercCombined, memPercUsed, uptime;
-
 	@JsonProperty
 	SigarStaticCpuInfo staticCpuInfo;
 	@JsonProperty
