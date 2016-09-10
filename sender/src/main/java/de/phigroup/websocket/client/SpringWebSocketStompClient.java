@@ -20,7 +20,9 @@ public interface SpringWebSocketStompClient {
 	 */
 	public void sendGreeting(String wsUrl, String endpointUri, String greeting) throws Exception;
 
-	public void sendSystemStatus(String wsUrl, final String endpointUri) throws Exception;
+	public void sendStaticSystemStatus(String wsUrl, final String endpointUri) throws Exception;
+	
+	public void sendDynamicSystemStatus(String wsUrl, final String endpointUri) throws Exception;
 	
 	/**
 	 * subscribe to a message channel

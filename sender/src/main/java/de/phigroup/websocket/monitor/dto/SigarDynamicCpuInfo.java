@@ -16,6 +16,7 @@ public class SigarDynamicCpuInfo {
 		
 		this.cpuNumber = cpuNumber;
 		
+		// times are measured in ms
 		idleTime = cpu.getIdle(); // Get the Total system cpu idle time.
 		irqTime = cpu.getIrq(); // Get the Total system cpu time servicing interrupts.
 		niceTime = cpu.getNice(); // Get the Total system cpu nice time.

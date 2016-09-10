@@ -28,7 +28,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.phigroup.websocket.MyStompSessionHandler;
 import de.phigroup.websocket.monitor.dto.Greeting;
-import de.phigroup.websocket.monitor.dto.SigarSystemStats;
+import de.phigroup.websocket.monitor.dto.SigarDynamicSystemStats;
+import de.phigroup.websocket.monitor.dto.SigarStaticSystemStats;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,13 +102,41 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 	}
 
 	@Override
-	public void sendSystemStatus(String wsUrl, final String endpointUri) throws Exception {
+	public void sendStaticSystemStatus(String wsUrl, final String endpointUri) throws Exception {
 
 		try {
 			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
 
 			// convert object to json
-			SigarSystemStats g = SigarSystemStats.getSigarSystemStatistics();
+			SigarStaticSystemStats g = SigarStaticSystemStats.getSigarSystemStatistics();
+			Jackson2JsonObjectMapper map = new Jackson2JsonObjectMapper();
+			String json = map.toJson(g);
+			
+			// send
+			Receiptable r = session.get().send(endpointUri, json.getBytes());
+
+			// check response
+			String response = r.toString();
+			String rid = r.getReceiptId();
+			
+			log.debug("rid: " + rid);
+			log.debug("Response: " + response);
+			
+		} catch (Exception e) {
+			
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+	
+	@Override
+	public void sendDynamicSystemStatus(String wsUrl, final String endpointUri) throws Exception {
+
+		try {
+			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
+
+			// convert object to json
+			SigarDynamicSystemStats g = SigarDynamicSystemStats.getSigarSystemStatistics();
 			Jackson2JsonObjectMapper map = new Jackson2JsonObjectMapper();
 			String json = map.toJson(g);
 			
@@ -187,9 +216,13 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 								Greeting greet = mapper.reader().forType(Greeting.class).readValue(json);
 								log.debug("greet: " + greet);
 								break;
-							case "/status/system":
-								SigarSystemStats stats = mapper.reader().forType(SigarSystemStats.class).readValue(json);
-								log.debug("stats: " + stats);
+							case "/status/system/dynamic":
+								SigarDynamicSystemStats statsDynamic = mapper.reader().forType(SigarDynamicSystemStats.class).readValue(json);
+								log.debug("stats: " + statsDynamic);
+								break;
+							case "/status/system/static":
+								SigarStaticSystemStats statsStatic = mapper.reader().forType(SigarStaticSystemStats.class).readValue(json);
+								log.debug("stats: " + statsStatic);
 								break;
 							default:
 								;

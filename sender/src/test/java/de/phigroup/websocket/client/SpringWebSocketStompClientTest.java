@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import de.phigroup.http.client.SpringHttpClient;
-import de.phigroup.websocket.monitor.dto.SigarSystemStats;
+import de.phigroup.websocket.monitor.dto.SigarDynamicSystemStats;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -78,7 +78,7 @@ public class SpringWebSocketStompClientTest {
 	public void testSigarSystem() {
 		
 		try {
-			SigarSystemStats stats = SigarSystemStats.getSigarSystemStatistics();
+			SigarDynamicSystemStats stats = SigarDynamicSystemStats.getSigarSystemStatistics();
 			
 			log.debug("stats: " + stats);
 			
@@ -118,13 +118,18 @@ public class SpringWebSocketStompClientTest {
 		}
 	}
 	
+	private void sendDynamicSystemStatus() throws Exception {
+
+		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/hello", "/status/system/dynamic");
+	}
+	
 	@Test
-	public void testSendSystemStatus() {
+	public void testSendStaticSystemStatus() {
 
 		try {
 
 			assertNotNull(stompClient);
-			stompClient.sendSystemStatus("ws://127.0.0.1:9090/hello", "/status/system");
+			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/hello", "/status/system/static");
 
 		} catch (Exception e) {
 
@@ -134,14 +139,29 @@ public class SpringWebSocketStompClientTest {
 	}
 	
 	@Test
-	public void testSendSystemStatusLoop() {
+	public void testSendDynamicSystemStatus() {
+
+		try {
+
+			assertNotNull(stompClient);
+			sendDynamicSystemStatus();
+
+		} catch (Exception e) {
+
+			log.error(e.getLocalizedMessage(), e);
+			fail();
+		}
+	}
+	
+	@Test
+	public void testSendDynamicSystemStatusLoop() {
 
 		try {
 			assertNotNull(stompClient);
 
 			for (int i = 0; i < 5; i++) {
 
-				stompClient.sendSystemStatus("ws://127.0.0.1:9090/hello", "/status/system");
+				sendDynamicSystemStatus();
 
 				Thread.sleep(1000);
 			}

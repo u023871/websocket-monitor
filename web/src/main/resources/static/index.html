@@ -133,33 +133,32 @@
 
 			setConnected(true);
 			console.log('Connected: ' + frame);
+			
+			// subscribe static system status broker
+			stompClient.subscribe('/status/system/static', function(staticSystemStatus) {
 
-			// subscribe CPU status broker
-			stompClient.subscribe('/status/cpu', function(statusCpu) {
-
-				var utilization = JSON.parse(statusCpu.body).utilization;
-				updateLight(utilization);
+				var cpuStatsStatic = JSON.parse(staticSystemStatus.body).staticCpuInfo;
+				showStaticCpuStats(cpuStatsStatic);
+				
+				var sysStatsStatic = JSON.parse(staticSystemStatus.body).staticSystemInfo;
+				showStaticSystemStats(sysStatsStatic);
 			});
 			
-			// subscribe system status broker
-			stompClient.subscribe('/status/system', function(statusSystem) {
+			// subscribe dynamic system status broker
+			stompClient.subscribe('/status/system/dynamic', function(dynamicSystemStatus) {
 
-				var cpuPercCombined = JSON.parse(statusSystem.body).cpuPercCombined;
-				var memPercUsed = JSON.parse(statusSystem.body).memPercUsed;
-				var uptime = JSON.parse(statusSystem.body).uptime;
+				var cpuPercCombined = JSON.parse(dynamicSystemStatus.body).cpuPercCombined;
+				var memPercUsed = JSON.parse(dynamicSystemStatus.body).memPercUsed;
+				var uptime = JSON.parse(dynamicSystemStatus.body).uptime;
 
 				updateLight(cpuPercCombined, 'cpuPercCombined');
 				updateLight(memPercUsed, 'memPercUsed');
 				
 				updateValue(uptime, 'uptime');
 				
-				var cpuStatsStatic = JSON.parse(statusSystem.body).staticCpuInfo;
-				showStaticCpuStats(cpuStatsStatic);
-				
-				var cpuStatsDyn = JSON.parse(statusSystem.body).dynamicCpuInfos;
+				var cpuStatsDyn = JSON.parse(dynamicSystemStatus.body).dynamicCpuInfos;
 				showDynamicCpuStats(cpuStatsDyn);
 				dynCpuStatsWritten = 1;
-				
 			});
 		});
 	}
@@ -189,6 +188,16 @@
 		replaceValue(cpuStats.cpuMhz, 'cpuMhz');
 		replaceValue(cpuStats.cpuModel, 'cpuModel');
 		replaceValue(cpuStats.cpuVendor, 'cpuVendor');
+	}
+	
+	/**
+	 * show other static stuff
+	 */
+	function showStaticSystemStats(sysStats) {
+		
+		replaceValue(sysStats.fqdn, 'fqdn');
+		
+		
 	}
 	
 	/**
@@ -285,11 +294,11 @@
 	        
 	        if(elementName.lastIndexOf('Perc') > -1) {
 	        	
-	        	value = $.format.number(value * 100, '##0.00');
+	        	value = $.format.number(value * 100, '##0.00') + '%';
 	        }
 	        else if(elementName.lastIndexOf('Time') > -1) {
 	        	
-	        	value = $.format.number(value / 60 / 60, '##0.00');
+	        	value = $.format.number(value / 1000, '##0.00') + 's';
 	        }
 	        else if(elementName.lastIndexOf('cpuNumber') > -1) {
 	        	
@@ -410,11 +419,17 @@
 		elementLight.replaceChild(newValueTextNode, elementLight.childNodes[0]);
 	}
 
+	/**
+	 * replace a string inside another string 
+	 */
 	function replaceAll(str, find, replace) {
 
 		return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
 	}
 
+	/**
+	 * escape regex patten in a string
+	 */
 	function escapeRegExp(str) {
 		return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 	}
@@ -453,9 +468,17 @@
 					NO DATA
 				</div>
 			</div>
+			<div class="row">
+				<div class="cellSimple">FQDN: </div>
+				<div id="fqdn" class="cellValue" class="cell lightInactive">
+					NO DATA
+				</div>
+			</div>
 		</div>		
 		<div class="table">
 			<div class="row">CPU (Static)</div>
+		</div>
+		<div class="table">
 			<div id="staticCpu" class="row">
 				<div class="cell lightInactive">
 					<div class="lightTitle">Vendor</div>
@@ -479,8 +502,10 @@
 				</div>
 			</div>
 		</div>
-		<div id="dynamicCpuTablePerc" class="table">
+		<div class="table">
 			<div class="row">CPU (Dynamic %)</div>
+		</div>
+		<div id="dynamicCpuTablePerc" class="table">
 			<div class="row">
 				<div class="cell lightInactive">
 					<div class="lightTitle">CPU #</div>
@@ -546,9 +571,11 @@
 				</div>
 			</div>
 		</div>
-			
-		<div id="dynamicCpuTableTimes" class="table">
+	
+		<div class="table">
 			<div class="row">CPU (Dynamic times)</div>
+		</div>
+		<div id="dynamicCpuTableTimes" class="table">
 			<div class="row">
 				<div class="cell lightInactive">
 					<div class="lightTitle">CPU #</div>
@@ -614,6 +641,59 @@
 				</div>
 			</div>
 		</div>
+	
+		<div class="table">
+			<div class="row">File system (static)</div>
+		</div>
+		<div id="staticFileSystemInfoTable" class="table">
+			<div class="row">
+				<div class="cell lightInactive">
+					<div class="lightTitle">Dev name</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Dir name</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Options</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">System type</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Type</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Flags</div>
+				</div>
+				<div class="cell lightInactive">
+					<div class="lightTitle">Type ID</div>
+				</div>
+			</div>
+			<div id="staticFileSystemRow" class="row hidden">
+				<div class="cell lightInactive">
+					<div id="devName" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="dirName" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="options" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="sysTypeName" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="typeName" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="flags" class="cellValue">NO DATA</div>
+				</div>
+				<div class="cell lightInactive">
+					<div id="type" class="cellValue">NO DATA</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 </body>
 
