@@ -58,6 +58,19 @@ public class SigarSystemStats {
 	    stats.setMemPercUsed(mem.getUsedPercent());
 	    stats.setUptime(uptime.getUptime());
 	    
+	    fillStaticCpuInfo(sigar, stats);
+	    
+	    fillDynamicCpuInfo(sigar, stats);
+	    
+	    return stats;
+	}
+	
+	/**
+	 * fill static CPU info
+	 * @throws SigarException 
+	 */
+	private static void fillStaticCpuInfo(Sigar sigar, SigarSystemStats stats) throws SigarException {
+	
 	    SigarStaticCpuInfo sigarCpuInfo = new SigarStaticCpuInfo();
 	    CpuInfo cpuInfo = sigar.getCpuInfoList()[0];
 	    sigarCpuInfo.setCpuCacheSize(cpuInfo.getCacheSize());
@@ -66,9 +79,16 @@ public class SigarSystemStats {
 	    sigarCpuInfo.setCpuTotalCores(cpuInfo.getTotalCores());
 	    sigarCpuInfo.setCpuModel(cpuInfo.getModel());
 	    sigarCpuInfo.setCpuVendor(cpuInfo.getVendor());
+	    
 	    stats.setStaticCpuInfo(sigarCpuInfo);
-	    
-	    
+	}
+	
+	/**
+	 * fill dynamic CPU info
+	 * @throws SigarException 
+	 */
+	private static void fillDynamicCpuInfo(Sigar sigar, SigarSystemStats stats) throws SigarException {
+		
 	    Cpu[] cpus = sigar.getCpuList();
 	    CpuPerc[] cpuPercs = sigar.getCpuPercList();
 	    
@@ -86,8 +106,6 @@ public class SigarSystemStats {
 	    	
 	    	stats.dynamicCpuInfos.add(dyn);
 		}
-	 
-	    return stats;
 	}
 	
 }

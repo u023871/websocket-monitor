@@ -114,6 +114,9 @@
 		document.getElementById('disconnect').disabled = !connected;
 	}
 
+	/**
+	 * connect Stomp client and add subscriptions
+	 */
 	function connect() {
 		var socket = new SockJS('/hello');
 		stompClient = Stomp.over(socket);
@@ -161,6 +164,9 @@
 		});
 	}
 
+	/**
+	 * disconned Stomp client
+	 */
 	function disconnect() {
 		if (stompClient != null) {
 			stompClient.disconnect();
@@ -169,6 +175,9 @@
 		console.log("Disconnected");
 	}
 
+	/**
+	 * show static CPU stats
+	 */
 	function showStaticCpuStats(cpuStats) {
 		
 		if(cpuStats.cpuCacheSize > 0) {
@@ -182,6 +191,9 @@
 		replaceValue(cpuStats.cpuVendor, 'cpuVendor');
 	}
 	
+	/**
+	 * show dynamic CPU stats
+	 */
 	function showDynamicCpuStats(cpuStats) {
 		
 		if(cpuStats != null) {
@@ -224,7 +236,7 @@
      * index: CPU index 
 	 * suffix: dynamicCpuRow id suffix, e.g. Perc
 	 */
-	function writeDynamicCpuLine(cpu, index, suffix) {
+	function writeDynamicCpuLine(cpuStats, index, suffix) {
 		
 		var dynamicCpuRowNodeOrig = document.getElementById('dynamicCpuRow' + suffix);
 		var dynamicCpuRowNode = dynamicCpuRowNodeOrig;
@@ -264,13 +276,12 @@
 			    dynamicCpuTableNode.appendChild(dynamicCpuRowNodeClone);
 			    dynamicCpuRowNodeClone.classList.remove('hidden');
 			}
-			
 		}
 
-	    for (var key in cpu) {
+	    for (var key in cpuStats) {
 	    	
 	        var elementName = key;
-	        var value = cpu[key];
+	        var value = cpuStats[key];
 	        
 	        if(elementName.lastIndexOf('Perc') > -1) {
 	        	
@@ -282,7 +293,10 @@
 	        }
 	        else if(elementName.lastIndexOf('cpuNumber') > -1) {
 	        	
-	        	$("#debug").append("suffix: " + suffix + ", value: " + value + "\n");
+// 	        	$("#debug").append("suffix: " + suffix + ", value: " + value + "\n");
+
+				// as we reuse the "cpuNumber" element in different tables, add a suffix
+	        	elementName = elementName + suffix;
 	        }
 	        
 	        replaceValue(value, elementName + index);
@@ -291,6 +305,9 @@
 		
 	}
 	
+	/**
+	 * replace a value (as text node) into a node
+	 */
 	function replaceValue(value, nodeName) {
 		
 		var node = document.getElementById(nodeName);
@@ -301,12 +318,15 @@
 		}
 	}
 
-	function updateValue(value, elementNamePrefix) {
+	/**
+	 * update some element with a value but format before depending on content
+	 */
+	function updateValue(value, elementName) {
 		
-		var elementStatusBox = document.getElementById(elementNamePrefix);
+		var elementStatusBox = document.getElementById(elementName);
 
 		// uptime
-		if (elementNamePrefix == 'uptime') {
+		if (elementName == 'uptime') {
 			
 			if(value != null && value > 0) {
 				
@@ -333,14 +353,12 @@
 			// make visible
 			elementStatusBox.classList.remove('hidden');
 		}
-
-		var newValueTextNode = document.createTextNode(value);
-
-		elementStatusBox.replaceChild(newValueTextNode, elementStatusBox.childNodes[0]);
+		
+		replaceValue(value, elementName);
 	}
 
 	/**
-	 * update system status red/green/yellow
+	 * update major system status lights into red/green/yellow
 	 */
 	function updateLight(value, elementNamePrefix) {
 
@@ -497,7 +515,7 @@
 			</div>			
 			<div id="dynamicCpuRowPerc" class="row hidden">
 				<div class="cell lightInactive">
-					<div id="cpuNumber" class="cellValue">NO DATA</div>
+					<div id="cpuNumberPerc" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div id="idlePerc" class="cellValue">NO DATA</div>
@@ -565,7 +583,7 @@
 			</div>
 			<div id="dynamicCpuRowTimes" class="row hidden">
 				<div class="cell lightInactive">
-					<div id="cpuNumber" class="cellValue">NO DATA</div>
+					<div id="cpuNumberTimes" class="cellValue">NO DATA</div>
 				</div>
 				<div class="cell lightInactive">
 					<div id="idleTime" class="cellValue">NO DATA</div>
