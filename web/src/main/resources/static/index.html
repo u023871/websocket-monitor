@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Hello WebSocket</title>
+<title>WebSocket Monitor</title>
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -9,10 +9,14 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Cache-control"
 	content="no-cache, no-store, must-revalidate" />
-<script src="sockjs-0.3.4.js"></script>
-<script src="jquery_1.7.1.min.js"></script>
-<script src="jquery.format-1.3.min.js"></script>
-<script src="stomp.js"></script>
+<script src="js/websocket/sockjs-0.3.4.js"></script>
+<script src="js/websocket/stomp.js"></script>
+<script src="js/jquery/jquery.min-1.9.1.js"></script>
+<script src="js/jquery/jquery.format-1.3.min.js"></script>
+<script src="js/kickstart.js"></script>
+<!-- KICKSTART -->
+<link rel="stylesheet" href="css/kickstart.css" media="all" />
+<!-- KICKSTART -->
 <style type="text/css">
 .body {
 	font: 16px courier, sans-serif;
@@ -86,10 +90,10 @@
 
 .cell {
 	display: table-cell;
-/* 	width: 150px; */
-/* 	height: 150px; */
+	/* 	width: 150px; */
+	/* 	height: 150px; */
 	border: 1px solid black;
-	padding:5px;
+	padding: 5px;
 }
 
 .cellSimple {
@@ -100,8 +104,6 @@
 	font-size: 12px;
 	font-weight: bold;
 }
-
-
 </style>
 
 <script type="text/javascript">
@@ -114,6 +116,15 @@
 		
 		document.getElementById('connect').disabled = connected;
 		document.getElementById('disconnect').disabled = !connected;
+		
+		if(connected) {
+			
+			document.getElementById('disconnect').classList.remove('disabled');
+			document.getElementById('connect').classList.add('disabled');
+		} else {
+			document.getElementById('disconnect').classList.add('disabled');
+			document.getElementById('connect').classList.remove('disabled');
+		}
 	}
 
 	/**
@@ -273,19 +284,19 @@
 	function writeTableRow(rowBean, index, suffix, rowElementName, tableElementName, rowTemplateCloneAlreadyAppendedAndUnhidden) {
 		
 		 
-		var dynamicCpuRowNodeOrig = document.getElementById(rowElementName + suffix);
-		var dynamicCpuRowNode = dynamicCpuRowNodeOrig;
+		var rowNodeOrig = document.getElementById(rowElementName + suffix);
+		var rowNode = rowNodeOrig;
 
-		if(dynamicCpuRowNode == null) {
+		if(rowNode == null) {
 			
-			dynamicCpuRowNode = document.getElementById(rowElementName + suffix + index);
+			rowNode = document.getElementById(rowElementName + suffix + index);
 		}
 
-		var dynamicCpuRowNodeClone = dynamicCpuRowNode.cloneNode(true);
+		var rowNodeClone = rowNode.cloneNode(true);
 
-		var dynamicCpuTableNode = document.getElementById(tableElementName + suffix);
+		var tableNode = document.getElementById(tableElementName + suffix);
 		
-		var divTags = dynamicCpuRowNodeClone.getElementsByTagName('div');
+		var divTags = rowNodeClone.getElementsByTagName('td');
 
 		// iterate all div tags and append index to them
 		for(var i=0; i<divTags.length; i++) {
@@ -300,16 +311,16 @@
 			}
 		}
 		
-		if(dynamicCpuRowNodeClone != null) {
+		if(rowNodeClone != null) {
 			
 			// set new id to clone
-			dynamicCpuRowNodeClone.id = rowElementName + suffix + index;
+			rowNodeClone.id = rowElementName + suffix + index;
 		
 			// unhide and append clone if row has not yet been rendered before
 			if(!rowTemplateCloneAlreadyAppendedAndUnhidden) {
 				
-			    dynamicCpuTableNode.appendChild(dynamicCpuRowNodeClone);
-			    dynamicCpuRowNodeClone.classList.remove('hidden');
+			    tableNode.appendChild(rowNodeClone);
+			    rowNodeClone.classList.remove('hidden');
 			}
 		}
 
@@ -348,6 +359,9 @@
 
 		if(node != null) {
 			
+// 			node.innerHTML = value;
+//  			delete node.value;
+// 			node.value = value;
 			node.replaceChild(document.createTextNode(value), node.childNodes[0]);
 		}
 	}
@@ -466,258 +480,224 @@
 			Javascript! Websocket relies on Javascript being enabled. Please
 			enable Javascript and reload this page!</h2>
 	</noscript>
+
+	<!-- 	overview -->
+	<!-- 	cpu -->
+	<!-- 	filesystem -->
+
 	<div>
 		<div id="debug" class="hidden">&#160;</div>
+
 		<div>
-			<button id="connect" onclick="connect();">Connect</button>
-			<button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+			<button id="connect" class="pill" onclick="connect();">Connect</button>
+			<button id="disconnect" class="pill" disabled="disabled"
+				onclick="disconnect();">Disconnect</button>
 		</div>
+
 		<div class="table">
 			<div class="row">
 				<div id="cpuPercCombined" class="cell lightInactive circle">
-					<div class="lightTitle">CPU<br/>Utilization</div>
+					<div class="lightTitle">
+						CPU<br />Utilization
+					</div>
 					<div id="cpuPercCombinedLight" class="lightValue">NO DATA</div>
 				</div>
-				<div class="cellSimple" style="padding:5px;">
-				</div>
+				<div class="cellSimple" style="padding: 5px;"></div>
 				<div id="memPercUsed" class="cell lightInactive circle">
-					<div class="lightTitle">Memory<br/>Utilization</div>
+					<div class="lightTitle">
+						Memory<br />Utilization
+					</div>
 					<div id="memPercUsedLight" class="lightValue">NO DATA</div>
 				</div>
 			</div>
 		</div>
+
 		<div class="table">
 			<div class="row">
-				<div class="cellSimple">CPU Uptime: </div>
+				<div class="cellSimple">CPU Uptime:</div>
 				<div id="uptime" class="cellValue" class="cell lightInactive">
-					NO DATA
-				</div>
+					NO DATA</div>
 			</div>
 			<div class="row">
-				<div class="cellSimple">FQDN: </div>
+				<div class="cellSimple">FQDN:</div>
 				<div id="fqdn" class="cellValue" class="cell lightInactive">
-					NO DATA
-				</div>
+					NO DATA</div>
 			</div>
-		</div>		
-		<div class="table">
-			<div class="row">CPU (Static)</div>
 		</div>
-		<div class="table">
-			<div id="staticCpu" class="row">
-				<div class="cell lightInactive">
+
+		<table class="table">
+			<tr class="row">
+				<td>CPU (Static)</td>
+			</tr>
+		</table>
+		<table class="stripped">
+			<tr id="staticCpu" class="row">
+				<td>
 					<div class="lightTitle">Vendor</div>
 					<div id="cpuVendor" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
+				</td>
+				<td>
 					<div class="lightTitle">Model</div>
 					<div id="cpuModel" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
+				</td>
+				<td>
 					<div class="lightTitle">Frequency</div>
 					<div id="cpuMhz" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
+				</td>
+				<td>
 					<div class="lightTitle">Total Cores</div>
 					<div id="cpuTotalCores" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
+				</td>
+				<td>
 					<div class="lightTitle">Cache Size</div>
 					<div id="cpuCacheSize" class="cellValue">NO DATA</div>
-				</div>
-			</div>
-		</div>
-		<div class="table">
-			<div class="row">CPU (Dynamic %)</div>
-		</div>
-		<div id="dynamicCpuTablePerc" class="table">
-			<div class="row">
-				<div class="cell lightInactive">
-					<div class="lightTitle">CPU #</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Idle</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">SYS</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">TOTAL/COMBINED</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">USER</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">WAIT</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">IRQ</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">NICE</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">SOFT IRQ</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">STOLEN</div>
-				</div>
-			</div>			
-			<div id="dynamicCpuRowPerc" class="row hidden">
-				<div class="cell lightInactive">
-					<div id="cpuNumberPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="idlePerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="sysPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="combinedPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="userPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="waitPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="irqPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="nicePerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="softIrqPerc" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="stolenPerc" class="cellValue">NO DATA</div>
-				</div>
-			</div>
-		</div>
+				</td>
+			</tr>
+		</table>
+
+		<h3>CPU (Dynamic %)</h3>
+		<table id="dynamicCpuTablePerc" class="stripped sortable">
+			<thead>
+				<tr>
+					<th>CPU #<th>
+						Idle
+		
+								</th>
+					
+					<th>
+						SYS
+					</th>
+					
+					<th>
+						TOTAL/COMBINED
+					</th>
+					
+					<th>
+						USER
+					</th>
+					
+					<th>
+						WAIT
+					</th>
+					
+					<th>
+						IRQ
+					</th>
+					
+					<th>
+						NICE
+					</th>
+					
+					<th>
+						SOFT IRQ
+					</th>
+					
+					<th>
+						STOLEN
+					</th>
+				
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="dynamicCpuRowPerc" class="hidden">
+					<td id="cpuNumberPerc" class="cellValue" />
+					<td id="idlePerc" class="cellValue" />
+					<td id="sysPerc" class="cellValue" />
+					<td id="combinedPerc" class="cellValue" />
+					<td id="userPerc" class="cellValue" />
+					<td id="waitPerc" class="cellValue" />
+					<td id="irqPerc" class="cellValue" />
+					<td id="nicePerc" class="cellValue" />
+					<td id="softIrqPerc" class="cellValue" />
+					<td id="stolenPerc" class="cellValue" />
+				</tr>
+			</tbody>
+		</table>
 	
-		<div class="table">
-			<div class="row">CPU (Dynamic times)</div>
-		</div>
-		<div id="dynamicCpuTableTimes" class="table">
-			<div class="row">
-				<div class="cell lightInactive">
-					<div class="lightTitle">CPU #</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Idle</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">SYS</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">TOTAL/COMBINED</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">USER</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">WAIT</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">IRQ</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">NICE</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">SOFT IRQ</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">STOLEN</div>
-				</div>
-			</div>
-			<div id="dynamicCpuRowTimes" class="row hidden">
-				<div class="cell lightInactive">
-					<div id="cpuNumberTimes" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="idleTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="sysTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="totalTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="userTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="waitTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="irqTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="niceTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="softIrqTime" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="stolenTime" class="cellValue">NO DATA</div>
-				</div>
-			</div>
-		</div>
+		<h3>CPU (Dynamic times)</h3>
+		<table id="dynamicCpuTableTimes" class="stripped sortable">
+			<thead>
+				<tr>
+					<th>
+						CPU #
+					</th>
+					<th>
+						Idle
+					</th>
+					<th>
+						SYS
+					</th>
+					<th>
+						TOTAL/COMBINED
+					</th>
+					<th>
+						USER
+					</th>
+					<th>
+						WAIT
+					</th>
+					<th>
+						IRQ
+					</th>
+					<th>
+						NICE
+					</th>
+					<th>
+						SOFT IRQ
+					</th>
+					<th>
+						STOLEN
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="dynamicCpuRowTimes" class="hidden">
+					<td id="cpuNumberTimes" class="cellValue" />
+					<td id="idleTime" class="cellValue" />
+					<td id="sysTime" class="cellValue" />
+					<td id="totalTime" class="cellValue" />
+					<td id="userTime" class="cellValue" />
+					<td id="waitTime" class="cellValue" />
+					<td id="irqTime" class="cellValue" />
+					<td id="niceTime" class="cellValue" />
+					<td id="softIrqTime" class="cellValue" />
+					<td id="stolenTime" class="cellValue" />
+				</tr>
+			</tbody>
+		</table>
 	
-		<div class="table">
-			<div class="row">File system (static)</div>
-		</div>
-		<div id="staticFileSystemTable" class="table">
-			<div class="row">
-				<div class="cell lightInactive">
-					<div class="lightTitle">Dev name</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Dir name</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Options</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">System type</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Type</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Flags</div>
-				</div>
-				<div class="cell lightInactive">
-					<div class="lightTitle">Type ID</div>
-				</div>
-			</div>
-			<div id="staticFileSystemRow" class="row hidden">
-				<div class="cell lightInactive">
-					<div id="devName" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="dirName" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="options" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="sysTypeName" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="typeName" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="flags" class="cellValue">NO DATA</div>
-				</div>
-				<div class="cell lightInactive">
-					<div id="type" class="cellValue">NO DATA</div>
-				</div>
-			</div>
-		</div>
+		<h3>File system (static)</h3>
+		<table id="staticFileSystemTable" class="stripped sortable">
+			<thead>
+				<tr>
+					<th>
+						Dev name
+					</th>
+					<th>
+						Dir name
+					</th>
+					<th>
+						Options
+					</th>
+					<th>
+						System type
+					</th>
+					<th>
+						Type
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr id="staticFileSystemRow" class="hidden">
+					<td id="devName" class="cellValue" />
+					<td id="dirName" class="cellValue" />
+					<td id="options" class="cellValue" />
+					<td id="sysTypeName" class="cellValue" />
+					<td id="typeName" class="cellValue" />
+				</tr>
+			</tbody>
+		</table>
+		
 
 	</div>
 </body>

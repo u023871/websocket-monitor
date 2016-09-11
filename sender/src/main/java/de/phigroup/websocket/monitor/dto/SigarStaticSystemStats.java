@@ -93,11 +93,9 @@ public class SigarStaticSystemStats {
 			
 			fsi.setDevName(fs.getDevName()); // e.g. \\phigroup-nas\Download
 			fsi.setDirName(fs.getDirName()); // e.g. Z:\
-			fsi.setFlags(fs.getFlags()); // e.g. 0
 			fsi.setOptions(fs.getOptions()); // e.g. rw
 			fsi.setSysTypeName(fs.getSysTypeName()); // e.g. NTFS or cdrom
 			fsi.setTypeName(fs.getTypeName()); // e.g. remote or cdrom
-			fsi.setType(fs.getType()); // e.g. 3
 
 			sigarStaticSystemInfo.getStaticFileSystemInfos().add(fsi);
 		}

@@ -153,7 +153,7 @@ public class SpringWebSocketStompClientTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSendDynamicSystemStatusLoop() {
 
 		try {

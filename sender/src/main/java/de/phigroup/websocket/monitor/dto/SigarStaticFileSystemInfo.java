@@ -10,6 +10,4 @@ public class SigarStaticFileSystemInfo {
 	options, // e.g. rw
 	sysTypeName, // e.g. NTFS or cdrom
 	typeName; // e.g. remote or cdrom
-	long flags; // e.g. 0
-	int type; // e.g. 3
 }
