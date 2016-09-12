@@ -156,6 +156,9 @@
 				var sysStatsStatic = JSON.parse(staticSystemStatus.body).staticSystemInfo;
 				showStaticSystemStats(sysStatsStatic);
 				
+				var fsStatsStatic = JSON.parse(staticSystemStatus.body).staticFileSystemInfos;
+				showStaticFileSystemStats(fsStatsStatic);
+				
 				staticSystemStatsWritten = true;
 			});
 			
@@ -215,21 +218,28 @@
 			
 			// FQDN
 			replaceValue(sysStats.fqdn, 'fqdn');
+		}
+	}
+	
+	
+	/**
+	 * show static file system stuff
+	 */
+	function showStaticFileSystemStats(fsStats) {
+		
+		// static file system info
+		if(fsStats != null) {
 			
-			// static file system info
-			if(sysStats.staticFileSystemInfos != null) {
+			for (var i = 0; i < fsStats.length; i++){
+				
+				writeTableRow(fsStats[i], i, "", "staticFileSystemRow", "staticFileSystemTable", staticSystemStatsWritten);
+			}
 
-				for (var i = 0; i < sysStats.staticFileSystemInfos.length; i++){
-					
-					writeTableRow(sysStats.staticFileSystemInfos[i], i, "", "staticFileSystemRow", "staticFileSystemTable", staticSystemStatsWritten);
-				}
-
-				// ensure to remove template row
-				var staticFileSystemRowNode = document.getElementById("staticFileSystemRow");
-				if(staticFileSystemRowNode != null) {
-					
-					staticFileSystemRowNode.outerHTML = "";
-				}
+			// ensure to remove template row
+			var staticFileSystemRowNode = document.getElementById("staticFileSystemRow");
+			if(staticFileSystemRowNode != null) {
+				
+				staticFileSystemRowNode.outerHTML = "";
 			}
 		}
 	}
@@ -287,13 +297,24 @@
 		var rowNodeOrig = document.getElementById(rowElementName + suffix);
 		var rowNode = rowNodeOrig;
 
+		var rowNodeClone = null;
+
 		if(rowNode == null) {
 			
-			rowNode = document.getElementById(rowElementName + suffix + index);
+			$jqClone = $('#' + rowElementName + suffix + index).clone();
+			
+		} else {
+			
+			$jqClone = $('#' + rowElementName + suffix).clone();
+
 		}
 
-		var rowNodeClone = rowNode.cloneNode(true);
-
+		// this works only if there is exactly one match
+		if($jqClone != null && $jqClone.length > 0) {
+			
+			rowNodeClone = $jqClone.get()[0];
+		}
+		
 		var tableNode = document.getElementById(tableElementName + suffix);
 		
 		var divTags = rowNodeClone.getElementsByTagName('td');
@@ -494,6 +515,7 @@
 				onclick="disconnect();">Disconnect</button>
 		</div>
 
+		<!-- colored CPU + memory usage lights -->
 		<div class="table">
 			<div class="row">
 				<div id="cpuPercCombined" class="cell lightInactive circle">
@@ -512,90 +534,61 @@
 			</div>
 		</div>
 
-		<div class="table">
-			<div class="row">
-				<div class="cellSimple">CPU Uptime:</div>
-				<div id="uptime" class="cellValue" class="cell lightInactive">
-					NO DATA</div>
-			</div>
-			<div class="row">
-				<div class="cellSimple">FQDN:</div>
-				<div id="fqdn" class="cellValue" class="cell lightInactive">
-					NO DATA</div>
-			</div>
-		</div>
-
-		<table class="table">
-			<tr class="row">
-				<td>CPU (Static)</td>
-			</tr>
-		</table>
 		<table class="stripped">
-			<tr id="staticCpu" class="row">
-				<td>
-					<div class="lightTitle">Vendor</div>
-					<div id="cpuVendor" class="cellValue">NO DATA</div>
-				</td>
-				<td>
-					<div class="lightTitle">Model</div>
-					<div id="cpuModel" class="cellValue">NO DATA</div>
-				</td>
-				<td>
-					<div class="lightTitle">Frequency</div>
-					<div id="cpuMhz" class="cellValue">NO DATA</div>
-				</td>
-				<td>
-					<div class="lightTitle">Total Cores</div>
-					<div id="cpuTotalCores" class="cellValue">NO DATA</div>
-				</td>
-				<td>
-					<div class="lightTitle">Cache Size</div>
-					<div id="cpuCacheSize" class="cellValue">NO DATA</div>
-				</td>
-			</tr>
+			<thead>
+				<tr>
+					<th>Metric</th>
+					<th>Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th>Uptime</th>
+					<td id="uptime">NO DATA</td>
+				</tr>
+				<tr>
+					<th>FQDN</th>
+					<td id="fqdn">NO DATA</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<h3>CPU (Static)</h3>
+		<table class="stripped sortable">
+			<thead>
+				<tr>
+					<th>Vendor</th>
+					<th>Model</th>
+					<th>Frequency</th>
+					<th>Total Cores</th>
+					<th>Cache Size</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td id="cpuVendor" class="cellValue">NO DATA</td>
+					<td id="cpuModel" class="cellValue">NO DATA</td>
+					<td id="cpuMhz" class="cellValue">NO DATA</td>
+					<td id="cpuTotalCores" class="cellValue">NO DATA</td>
+					<td id="cpuCacheSize" class="cellValue">NO DATA</td>
+				</tr>
+			</tbody>
 		</table>
 
 		<h3>CPU (Dynamic %)</h3>
 		<table id="dynamicCpuTablePerc" class="stripped sortable">
 			<thead>
 				<tr>
-					<th>CPU #<th>
-						Idle
-		
-								</th>
-					
-					<th>
-						SYS
-					</th>
-					
-					<th>
-						TOTAL/COMBINED
-					</th>
-					
-					<th>
-						USER
-					</th>
-					
-					<th>
-						WAIT
-					</th>
-					
-					<th>
-						IRQ
-					</th>
-					
-					<th>
-						NICE
-					</th>
-					
-					<th>
-						SOFT IRQ
-					</th>
-					
-					<th>
-						STOLEN
-					</th>
-				
+					<th>CPU #
+					<th>Idle</th>
+					<th>SYS</th>
+					<th>TOTAL/COMBINED</th>
+					<th>USER</th>
+					<th>WAIT</th>
+					<th>IRQ</th>
+					<th>NICE</th>
+					<th>SOFT IRQ</th>
+					<th>STOLEN</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -618,36 +611,16 @@
 		<table id="dynamicCpuTableTimes" class="stripped sortable">
 			<thead>
 				<tr>
-					<th>
-						CPU #
-					</th>
-					<th>
-						Idle
-					</th>
-					<th>
-						SYS
-					</th>
-					<th>
-						TOTAL/COMBINED
-					</th>
-					<th>
-						USER
-					</th>
-					<th>
-						WAIT
-					</th>
-					<th>
-						IRQ
-					</th>
-					<th>
-						NICE
-					</th>
-					<th>
-						SOFT IRQ
-					</th>
-					<th>
-						STOLEN
-					</th>
+					<th>CPU #</th>
+					<th>Idle</th>
+					<th>SYS</th>
+					<th>TOTAL/COMBINED</th>
+					<th>USER</th>
+					<th>WAIT</th>
+					<th>IRQ</th>
+					<th>NICE</th>
+					<th>SOFT IRQ</th>
+					<th>STOLEN</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -666,25 +639,46 @@
 			</tbody>
 		</table>
 	
+		<!-- TODO: colored FS usage lights -->
+		<div class="table">
+			<div class="row">
+				<div id="fsTotal" class="cell lightInactive circle">
+					<div class="lightTitle">
+						Total
+					</div>
+					<div id="fsTotalLight" class="lightValue">NO DATA</div>
+				</div>
+				<div id="fsUsage" class="cell lightInactive circle">
+					<div class="lightTitle">
+						Usage
+					</div>
+					<div id="fsUsageLight" class="lightValue">NO DATA</div>
+				</div>
+				<div id="fsUsagePerc" class="cell lightInactive circle">
+					<div class="lightTitle">
+						Usage %
+					</div>
+					<div id="fsPercLight" class="lightValue">NO DATA</div>
+				</div>
+				<div id="fsFree" class="cell lightInactive circle">
+					<div class="lightTitle">
+						Free
+					</div>
+					<div id="fsFreeLight" class="lightValue">NO DATA</div>
+				</div>
+				<div class="cellSimple" style="padding: 5px;"></div>
+			</div>
+		</div>
+	
 		<h3>File system (static)</h3>
 		<table id="staticFileSystemTable" class="stripped sortable">
 			<thead>
 				<tr>
-					<th>
-						Dev name
-					</th>
-					<th>
-						Dir name
-					</th>
-					<th>
-						Options
-					</th>
-					<th>
-						System type
-					</th>
-					<th>
-						Type
-					</th>
+					<th>Dev name</th>
+					<th>Dir name</th>
+					<th>Options</th>
+					<th>System type</th>
+					<th>Type</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -697,7 +691,7 @@
 				</tr>
 			</tbody>
 		</table>
-		
+
 
 	</div>
 </body>

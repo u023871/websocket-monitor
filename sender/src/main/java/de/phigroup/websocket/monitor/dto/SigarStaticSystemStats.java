@@ -34,21 +34,53 @@ public class SigarStaticSystemStats {
 
 	@JsonProperty
 	SigarStaticCpuInfo staticCpuInfo;
+	
 	@JsonProperty
 	SigarStaticSystemInfo staticSystemInfo;
-
-	@JsonIgnore
-	public static SigarStaticSystemStats getSigarSystemStatistics() throws SigarException {
-
-		SigarStaticSystemStats stats = new SigarStaticSystemStats();
-
-		Sigar sigar = new Sigar();
 	
-		fillStaticCpuInfo(sigar, stats);
+	@JsonProperty
+	ArrayList<SigarStaticFileSystemInfo> staticFileSystemInfos;
+	
+	@JsonIgnore
+	Sigar sigar;
+	
+	@JsonIgnore
+	static SigarStaticSystemStats instance;
 
-		fillStaticSystemInfo(sigar, stats);
+	/**
+	 * hide default constructor
+	 */
+	private SigarStaticSystemStats() {
+		
+	}
+	
+	/**
+	 * get filled singleton
+	 * @return
+	 * @throws SigarException
+	 */
+	public static SigarStaticSystemStats getFilledInstance() throws SigarException {
+	
+		if(SigarStaticSystemStats.instance == null) {
+			
+			SigarStaticSystemStats.instance = new SigarStaticSystemStats();
+			
+			SigarStaticSystemStats.instance.setSigar(new Sigar());
+			
+			SigarStaticSystemStats.instance.fill();
+		}
+		
+		return SigarStaticSystemStats.instance;
+	}
+	
+	@JsonIgnore
+	public void fill() throws SigarException {
 
-		return stats;
+		this.setStaticCpuInfo(fillStaticCpuInfo());
+
+		this.setStaticSystemInfo(fillStaticSystemInfo());
+
+		this.setStaticFileSystemInfos(fillStaticFileSystemInfos());
 	}
 
 	/**
@@ -56,10 +88,10 @@ public class SigarStaticSystemStats {
 	 * 
 	 * @throws SigarException
 	 */
-	private static void fillStaticCpuInfo(Sigar sigar, SigarStaticSystemStats stats) throws SigarException {
+	public SigarStaticCpuInfo fillStaticCpuInfo() throws SigarException {
 
 		SigarStaticCpuInfo sigarCpuInfo = new SigarStaticCpuInfo();
-		CpuInfo cpuInfo = sigar.getCpuInfoList()[0];
+		CpuInfo cpuInfo = getSigar().getCpuInfoList()[0];
 		sigarCpuInfo.setCpuCacheSize(cpuInfo.getCacheSize());
 		sigarCpuInfo.setCpuCoresPerSocket(cpuInfo.getCoresPerSocket());
 		sigarCpuInfo.setCpuMhz(cpuInfo.getMhz());
@@ -67,7 +99,7 @@ public class SigarStaticSystemStats {
 		sigarCpuInfo.setCpuModel(cpuInfo.getModel());
 		sigarCpuInfo.setCpuVendor(cpuInfo.getVendor());
 
-		stats.setStaticCpuInfo(sigarCpuInfo);
+		return sigarCpuInfo;
 	}
 
 	/**
@@ -75,18 +107,27 @@ public class SigarStaticSystemStats {
 	 * 
 	 * @throws SigarException
 	 */
-	private static void fillStaticSystemInfo(Sigar sigar, SigarStaticSystemStats stats) throws SigarException {
+	public SigarStaticSystemInfo fillStaticSystemInfo() throws SigarException {
 
 		SigarStaticSystemInfo sigarStaticSystemInfo = new SigarStaticSystemInfo();
 
-		sigarStaticSystemInfo.setFqdn(sigar.getFQDN());
+		sigarStaticSystemInfo.setFqdn(getSigar().getFQDN());
 
-		if (sigarStaticSystemInfo.getStaticFileSystemInfos() == null) {
-			sigarStaticSystemInfo.setStaticFileSystemInfos(new ArrayList<>());
-		}
+		return sigarStaticSystemInfo;
+	}
+	
+
+	/**
+	 * fill static file system infos
+	 * 
+	 * @throws SigarException
+	 */
+	public ArrayList<SigarStaticFileSystemInfo> fillStaticFileSystemInfos() throws SigarException {
+
+		ArrayList<SigarStaticFileSystemInfo> fileSystemInfos = new ArrayList<>();
 		
 		// returns a collection of file system mounts
-		FileSystem[] fss = sigar.getFileSystemList();
+		FileSystem[] fss = getSigar().getFileSystemList();
 		for (FileSystem fs : fss) {
 
 			SigarStaticFileSystemInfo fsi = new SigarStaticFileSystemInfo();
@@ -97,11 +138,9 @@ public class SigarStaticSystemStats {
 			fsi.setSysTypeName(fs.getSysTypeName()); // e.g. NTFS or cdrom
 			fsi.setTypeName(fs.getTypeName()); // e.g. remote or cdrom
 
-			sigarStaticSystemInfo.getStaticFileSystemInfos().add(fsi);
+			fileSystemInfos.add(fsi);
 		}
-
-		stats.setStaticSystemInfo(sigarStaticSystemInfo);
 		
-		System.out.println(stats.getStaticSystemInfo());
+		return fileSystemInfos;
 	}
 }

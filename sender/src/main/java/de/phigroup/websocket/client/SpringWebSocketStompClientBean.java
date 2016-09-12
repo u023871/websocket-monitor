@@ -108,7 +108,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
 
 			// convert object to json
-			SigarStaticSystemStats g = SigarStaticSystemStats.getSigarSystemStatistics();
+			SigarStaticSystemStats g = SigarStaticSystemStats.getFilledInstance();
 			Jackson2JsonObjectMapper map = new Jackson2JsonObjectMapper();
 			String json = map.toJson(g);
 			
@@ -136,7 +136,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
 
 			// convert object to json
-			SigarDynamicSystemStats g = SigarDynamicSystemStats.getSigarSystemStatistics();
+			SigarDynamicSystemStats g = SigarDynamicSystemStats.getNewFilledInstance();
 			Jackson2JsonObjectMapper map = new Jackson2JsonObjectMapper();
 			String json = map.toJson(g);
 			

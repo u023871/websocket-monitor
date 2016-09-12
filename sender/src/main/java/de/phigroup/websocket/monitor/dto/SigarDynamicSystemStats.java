@@ -1,6 +1,7 @@
 package de.phigroup.websocket.monitor.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.hyperic.sigar.Cpu;
 import org.hyperic.sigar.CpuPerc;
@@ -14,10 +15,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * google OperatingSystemMXBean for a simple alternative, but with very few
- * values only
+ * values only.
  * 
  * Test Sigar stuff with
  * -Djava.library.path="D:\DEV\Workspaces\Spring\gs-messaging-stomp-websocket\stomp-websocket-client\src\main\resources\sigar\lib",
@@ -29,10 +31,13 @@ import lombok.Data;
  * BTW: Do not use inner classes, this is crap and deserializing them with
  * ObjectMapper is hard if you browse the web...
  * 
+ * We cannot make this dynamic content a singleton.
+ * 
  * @author u023871
  *
  */
 @Data
+@Slf4j
 public class SigarDynamicSystemStats {
 
 	double cpuPercCombined, memPercUsed, uptime;
@@ -40,38 +45,73 @@ public class SigarDynamicSystemStats {
 	@JsonProperty
 	ArrayList<SigarDynamicCpuInfo> dynamicCpuInfos;
 
+	@JsonProperty
+	ArrayList<SigarDynamicFileSystemInfo> dynamicFileSystemInfos;
+
 	@JsonIgnore
-	public static SigarDynamicSystemStats getSigarSystemStatistics() throws SigarException {
+	Sigar sigar;
 
+	/**
+	 * hide default constructor
+	 */
+	private SigarDynamicSystemStats() {
+		
+	}
+	
+	/**
+	 * get filled new instance (we cannot make this dynamic content a singleton)
+	 * @return
+	 * @throws SigarException
+	 */
+	public static SigarDynamicSystemStats getNewFilledInstance() throws SigarException {
+		
 		SigarDynamicSystemStats stats = new SigarDynamicSystemStats();
+		
+		long timeBefore = new Date().getTime(), timeAfter = 0;
+		System.out.println("timeBefore: " + timeBefore);
+		stats.setSigar(new Sigar());
+		timeAfter = new Date().getTime();
+		System.out.println("timeAfter: " + timeAfter);
+		System.out.println("Time to open Sigar instance: " + (timeBefore - timeAfter));
+		
+		stats.fill();
+		
+		return stats;
+	}
+	
+	@JsonIgnore
+	public void fill() throws SigarException {
 
-		Sigar sigar = new Sigar();
 		Mem mem = null;
 		CpuPerc cpuperc = null;
-		FileSystemUsage filesystemusage = null;
 
-		mem = sigar.getMem();
-		cpuperc = sigar.getCpuPerc();
-		filesystemusage = sigar.getFileSystemUsage("C:");
+		mem = getSigar().getMem();
+		cpuperc = getSigar().getCpuPerc();
 
 		Uptime uptime = new Uptime();
 
-		stats.setCpuPercCombined((cpuperc.getCombined() * 100));
-		stats.setMemPercUsed(mem.getUsedPercent());
-		stats.setUptime(uptime.getUptime());
+		this.setCpuPercCombined((cpuperc.getCombined() * 100));
+		this.setMemPercUsed(mem.getUsedPercent());
+		this.setUptime(uptime.getUptime());
 
-		fillDynamicCpuInfo(sigar, stats);
+		this.setDynamicCpuInfos(fillDynamicCpuInfo());
 
-		return stats;
+		this.setDynamicFileSystemInfos(fillDynamicFileSystemInfo());
 	}
 
 	/**
 	 * fill dynamic CPU info
 	 * 
+	 * TODO: split into own feed
+	 * 
 	 * @throws SigarException
 	 */
-	private static void fillDynamicCpuInfo(Sigar sigar, SigarDynamicSystemStats stats) throws SigarException {
+	public ArrayList<SigarDynamicCpuInfo> fillDynamicCpuInfo() throws SigarException {
 
+		Sigar sigar = new Sigar();
+		
+		ArrayList<SigarDynamicCpuInfo> dynamicCpuInfos = new ArrayList<>();
+		
 		Cpu[] cpus = sigar.getCpuList();
 		CpuPerc[] cpuPercs = sigar.getCpuPercList();
 
@@ -80,15 +120,49 @@ public class SigarDynamicSystemStats {
 			Cpu cpu = cpus[i];
 			CpuPerc cpuPerc = cpuPercs[i];
 
-			if (stats.getDynamicCpuInfos() == null) {
-				stats.setDynamicCpuInfos(new ArrayList<>());
-			}
-
 			SigarDynamicCpuInfo dyn = new SigarDynamicCpuInfo();
 			dyn.fill(cpu, cpuPerc, i);
 
-			stats.getDynamicCpuInfos().add(dyn);
+			dynamicCpuInfos.add(dyn);
 		}
+		
+		return dynamicCpuInfos;
 	}
 
+	/**
+	 * fill dynamic FS info
+	 * 
+	 * TODO: split into own feed
+	 * 
+	 * @throws SigarException
+	 */
+	public ArrayList<SigarDynamicFileSystemInfo> fillDynamicFileSystemInfo() throws SigarException {
+
+		ArrayList<SigarDynamicFileSystemInfo> fileSystemInfos = new ArrayList<>();
+
+		SigarStaticSystemStats g = SigarStaticSystemStats.getFilledInstance();
+		ArrayList<SigarStaticFileSystemInfo> fsi = g.fillStaticFileSystemInfos();
+
+		for (SigarStaticFileSystemInfo sigarStaticFileSystemInfo : fsi) {
+			
+			String devName = sigarStaticFileSystemInfo.getDevName();
+			
+			try {
+				FileSystemUsage fileSystemUsage = getSigar().getFileSystemUsage(devName);
+				SigarDynamicFileSystemInfo dynamicFileSystemInfo = new SigarDynamicFileSystemInfo();
+				dynamicFileSystemInfo.fill(fileSystemUsage, devName);
+				fileSystemInfos.add(dynamicFileSystemInfo);
+				
+			} catch (Exception e) {
+
+				// catch because FS might not be accessible or down or whatever
+				log.error(e.getMessage(), e);
+			}
+		}
+		
+		System.out.println("fileSystemInfos: " + fileSystemInfos);
+		
+		return fileSystemInfos;
+		
+	}
 }

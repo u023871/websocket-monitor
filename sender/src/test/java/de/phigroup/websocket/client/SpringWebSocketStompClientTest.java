@@ -17,6 +17,7 @@ import org.springframework.util.concurrent.ListenableFuture;
 
 import de.phigroup.http.client.SpringHttpClient;
 import de.phigroup.websocket.monitor.dto.SigarDynamicSystemStats;
+import de.phigroup.websocket.monitor.dto.SigarStaticSystemStats;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -75,10 +76,25 @@ public class SpringWebSocketStompClientTest {
 	}
 
 	@Test
-	public void testSigarSystem() {
+	public void testSigarDynamicSystemStats() {
 		
 		try {
-			SigarDynamicSystemStats stats = SigarDynamicSystemStats.getSigarSystemStatistics();
+			SigarDynamicSystemStats stats = SigarDynamicSystemStats.getNewFilledInstance();
+			
+			log.debug("stats: " + stats);
+			
+		} catch (SigarException e) {
+
+			log.error(e.getLocalizedMessage(), e);
+			fail();
+		}
+	}
+
+	@Test
+	public void testSigarStaticSystemStats() {
+		
+		try {
+			SigarStaticSystemStats stats = SigarStaticSystemStats.getFilledInstance();
 			
 			log.debug("stats: " + stats);
 			
