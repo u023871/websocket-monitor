@@ -111,7 +111,71 @@
 	var stompClient = null;
 	var dynCpuStatsWritten = false;
 	var staticSystemStatsWritten = false;
+	var currentHostId = 0;
 
+	/**
+	 * init on load
+	 */
+	function initialize() {
+		
+		disconnect();
+		loadHosts();
+	}
+	
+	/**
+	 * load hosts on load
+	 */
+	function loadHosts() {
+		
+	    $.ajax({
+	        url: "http://localhost:9090/hosts"
+	    }).then(function(data) {
+	    	
+	    	currentHostId = data._embedded.hosts[0].id;
+	    	
+	       	$('#host-ip').text(data._embedded.hosts[0].ip);
+	       	$('#host-name').text(data._embedded.hosts[0].name);
+	       	$('#host-url').text(data._embedded.hosts[0].url);
+
+		    
+		    setCurrentHost(data._embedded.hosts[0]);
+		});
+	};
+	
+	
+	/**
+	 * load hosts on load
+	 */
+	function getHost(id) {
+		
+	    var host;
+
+	    $.ajax({
+	        type: "GET",
+	        url: "http://localhost:9090/hosts/" + id,
+	        async: false,
+	        success : function(data) {
+	            host = data;
+	        }
+	    });
+
+	    return host;
+	};
+	
+	/**
+	 * load hosts on load
+	 */
+	function setCurrentHost(host) {
+		
+		if(host != null) {
+			
+		   	$('#currentHost').text(host.name);
+		}
+	};
+	
+	/**
+	 * set status to dis/connected
+	 */
 	function setConnected(connected) {
 		
 		document.getElementById('connect').disabled = connected;
@@ -495,16 +559,12 @@
 	}
 </script>
 </head>
-<body onload="disconnect()" class="body">
+<body onload="initialize()" class="body">
 	<noscript>
 		<h2 style="color: #ff0000">Seems your browser doesn't support
 			Javascript! Websocket relies on Javascript being enabled. Please
 			enable Javascript and reload this page!</h2>
 	</noscript>
-
-	<!-- 	overview -->
-	<!-- 	cpu -->
-	<!-- 	filesystem -->
 
 	<div>
 		<div id="debug" class="hidden">&#160;</div>
@@ -515,7 +575,26 @@
 				onclick="disconnect();">Disconnect</button>
 		</div>
 
+		<h3>Available hosts</h3>
+		<table class="stripped">
+			<thead>
+				<tr>
+					<th>IP</th>
+					<th>Name</th>
+					<th>URL</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td id="host-ip">NO DATA</td>
+					<td id="host-name">NO DATA</td>
+					<td id="host-url">NO DATA</td>
+				</tr>
+			</tbody>
+		</table>
+
 		<!-- colored CPU + memory usage lights -->
+		<h1 id="currentHost">NO DATA</h1>
 		<div class="table">
 			<div class="row">
 				<div id="cpuPercCombined" class="cell lightInactive circle">
@@ -534,6 +613,7 @@
 			</div>
 		</div>
 
+		<h3>Static metrics</h3>
 		<table class="stripped">
 			<thead>
 				<tr>

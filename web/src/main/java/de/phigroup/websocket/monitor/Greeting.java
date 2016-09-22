@@ -1,5 +1,8 @@
 package de.phigroup.websocket.monitor;
 
+import lombok.Data;
+
+@Data
 public class Greeting {
     
     private String content;
@@ -7,9 +10,4 @@ public class Greeting {
     public Greeting(String content) {
         this.content = content;
     }
-
-    public String getContent() {
-        return content;
-    }
-
 }
