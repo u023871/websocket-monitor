@@ -28,7 +28,10 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 	 */
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/hello").withSockJS();
+		
+		// you can register hosts allowed to connect to our web sockets with setAllowedOrigins
+		// TODO: encapsulate into properties or DB
+		registry.addEndpoint("/hello").setAllowedOrigins("*").withSockJS();
 	}
 
 }

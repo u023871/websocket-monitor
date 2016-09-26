@@ -150,6 +150,7 @@
 		
 	    var host;
 
+	    // TODO: how to...?
 	    $.ajax({
 	        type: "GET",
 	        url: "http://localhost:9090/hosts/" + id,
@@ -195,7 +196,9 @@
 	 * connect Stomp client and add subscriptions
 	 */
 	function connect() {
-		var socket = new SockJS('/hello');
+		
+// 		var socket = new SockJS('/hello');
+		var socket = new SockJS('http://192.168.1.43:9090/hello');
 		stompClient = Stomp.over(socket);
 
 		/* enable Stomp client debugging by uncommenting
