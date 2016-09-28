@@ -40,11 +40,6 @@
 					hostsRowNode.outerHTML = "";
 				}
 			}
-	    	
-//	       	$('#host-id').text(data._embedded.hosts[0].id);
-//	       	$('#host-ip').text(data._embedded.hosts[0].ip);
-//	       	$('#host-name').text(data._embedded.hosts[0].name);
-//	       	$('#host-url').text(data._embedded.hosts[0].url);
 
 		    setCurrentHost(hosts[0]);
 		});

@@ -30,13 +30,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "classpath:applicationContext.xml" })
-public class SpringWebSocketStompClientTest {
+public class SpringWebSocketStompMessageBrokerTest {
 	
 	@Autowired
 	private SpringHttpClient client;
 
 	@Autowired
-	private SpringWebSocketStompClient stompClient;
+	private SpringWebSocketStompMessageBroker stompClient;
 
 	ListenableFuture<StompSession> session;
 
@@ -136,7 +136,7 @@ public class SpringWebSocketStompClientTest {
 	
 	private void sendDynamicSystemStatus() throws Exception {
 
-//		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "127.0.0.1");
+		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "127.0.0.1");
 		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "192.168.1.43");
 	}
 	
@@ -146,7 +146,7 @@ public class SpringWebSocketStompClientTest {
 		try {
 
 			assertNotNull(stompClient);
-//			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "127.0.0.1");
+			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "127.0.0.1");
 			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "192.168.1.43");
 
 		} catch (Exception e) {
