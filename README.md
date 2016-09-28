@@ -4,14 +4,23 @@ Spring boot/websocket/integration and JQuery/SockJS based monitoring web applica
 * Run web as Spring Boot app
 * Run sender as Spring Boot app
 * open http://localhost:9090/monitor
-* run SpringWebSocketStompClientTest and watch sender Application and index.html receiving content sent by this JUnit test
-* using "HTML Kickstarter" framework for HTML layout
+* run SpringWebSocketStompClientTest (make sure correct java.library.path for Sigar is set) and watch sender Application and index.html receiving content sent by this JUnit test
+
+Backend architecture
+* Spring Boot
+* Spring Web Socket
+* Spring REST
+* Spring JPA + MariaDB
+* Spring Scheduler
+
+Frontend architecture
+* HTML 5
+* jQuery
+* HTML Kickstarter
+* SockJS
 
 Plan
-* create a class for storing connected hosts in DB,
-* then make a REST IF for it,
-* then read it out on web using jquery,
-* then install an instance on each target host,
+* install an instance of websocket-monitor-sender Spring Boot App on each source host
 * install mariadb and configure in the controller web application, which is the websocket-monitor-web spring boot app, with this central DB
-* BooM! You got a web application which just needs to know which nodes exist... enhancement would be to feed this webapp with these infos from the nodes directly via websocket push...
+* BooM! You got a web application which just needs to know which nodes exist...
 
