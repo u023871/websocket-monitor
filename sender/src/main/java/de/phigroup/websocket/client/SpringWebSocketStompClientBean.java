@@ -60,7 +60,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 		WebSocketStompClient stompClient = new WebSocketStompClient(transport);
 		
 		// create session
-		String url = StringUtils.isEmpty(wsUrl) ? "ws://127.0.0.1:9090/hello" : wsUrl;
+		String url = StringUtils.isEmpty(wsUrl) ? "ws://127.0.0.1:9090/monitor/hello" : wsUrl;
 		StompSessionHandler sessionHandler = new MyStompSessionHandler();
 		session = stompClient.connect(url, sessionHandler);
 		
@@ -102,7 +102,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 	}
 
 	@Override
-	public void sendStaticSystemStatus(String wsUrl, final String endpointUri) throws Exception {
+	public void sendStaticSystemStatus(String wsUrl, final String endpointUri, final String sourceHost) throws Exception {
 
 		try {
 			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
@@ -113,7 +113,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 			String json = map.toJson(g);
 			
 			// send
-			Receiptable r = session.get().send(endpointUri, json.getBytes());
+			Receiptable r = session.get().send(endpointUri + "/" + sourceHost, json.getBytes());
 
 			// check response
 			String response = r.toString();
@@ -130,7 +130,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 	}
 	
 	@Override
-	public void sendDynamicSystemStatus(String wsUrl, final String endpointUri) throws Exception {
+	public void sendDynamicSystemStatus(String wsUrl, final String endpointUri, final String sourceHost) throws Exception {
 
 		try {
 			ListenableFuture<StompSession> session = connectStompSession(wsUrl);
@@ -141,7 +141,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 			String json = map.toJson(g);
 			
 			// send
-			Receiptable r = session.get().send(endpointUri, json.getBytes());
+			Receiptable r = session.get().send(endpointUri + "/" + sourceHost, json.getBytes());
 
 			// check response
 			String response = r.toString();
@@ -160,10 +160,10 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 	/*
 	 * See https://github.com/rstoyanchev/spring-websocket-portfolio/blob/master/src/test/java/org/springframework/samples/portfolio/web/tomcat/IntegrationPortfolioTests.java
 	 *  (non-Javadoc)
-	 * @see com.lhsystems.websocket.client.SpringWebSocketStompClient#subscribe(java.lang.String, java.lang.String)
+	 * @see com.lhsystems.websocket.client.SpringWebSocketStompClient#subscribe(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public Subscription subscribe(ListenableFuture<StompSession> session, final String sendToEndpointUri) throws Exception {
+	public Subscription subscribe(ListenableFuture<StompSession> session, final String sendToEndpointUri, final String sourceHost) throws Exception {
 		
 		Subscription s = null;
 		try {
@@ -174,7 +174,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 			final AtomicReference<Object> result = new AtomicReference<Object>();
 			    
 			// subscribe (only in case you want to subscribe a message stream)
-			s = session.get().subscribe(sendToEndpointUri, new StompFrameHandler() {
+			s = session.get().subscribe(sendToEndpointUri + "/" + sourceHost, new StompFrameHandler() {
 							
 			    @Override
 			    public Type getPayloadType(StompHeaders headers) {
@@ -210,7 +210,7 @@ public class SpringWebSocketStompClientBean implements SpringWebSocketStompClien
 						ObjectMapper mapper = new ObjectMapper();
 						
 						// switch type here
-						switch(sendToEndpointUri) {
+						switch(sendToEndpointUri + "/" + sourceHost) {
 							
 							case "/topic/greetings":
 								Greeting greet = mapper.reader().forType(Greeting.class).readValue(json);

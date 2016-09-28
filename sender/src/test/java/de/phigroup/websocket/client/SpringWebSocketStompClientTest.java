@@ -65,7 +65,7 @@ public class SpringWebSocketStompClientTest {
 		try {
 
 			assertNotNull(stompClient);
-			stompClient.sendGreeting("ws://127.0.0.1:9090/hello", "/topic/greetings",
+			stompClient.sendGreeting("ws://127.0.0.1:9090/monitor/hello", "/topic/greetings",
 					"Hi Lars " + (new Random().nextGaussian()));
 
 		} catch (Exception e) {
@@ -121,7 +121,7 @@ public class SpringWebSocketStompClientTest {
 
 			for (int i = 0; i < 5; i++) {
 
-				stompClient.sendGreeting("ws://127.0.0.1:9090/hello", "/topic/greetings",
+				stompClient.sendGreeting("ws://127.0.0.1:9090/monitor/hello", "/topic/greetings",
 						"Hi Leute " + (new Random().nextGaussian()));
 
 				Thread.sleep(1000);
@@ -136,7 +136,8 @@ public class SpringWebSocketStompClientTest {
 	
 	private void sendDynamicSystemStatus() throws Exception {
 
-		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/hello", "/status/system/dynamic");
+//		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "127.0.0.1");
+		stompClient.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "192.168.1.43");
 	}
 	
 	@Test
@@ -145,7 +146,8 @@ public class SpringWebSocketStompClientTest {
 		try {
 
 			assertNotNull(stompClient);
-			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/hello", "/status/system/static");
+//			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "127.0.0.1");
+			stompClient.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "192.168.1.43");
 
 		} catch (Exception e) {
 

@@ -27,13 +27,13 @@ public class Application implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		ListenableFuture<StompSession> session = stompClient.connectStompSession("ws://127.0.0.1:9090/hello");
+		ListenableFuture<StompSession> session = stompClient.connectStompSession("ws://127.0.0.1:9090/monitor/hello");
 		
 		@SuppressWarnings("unused")
-		Subscription sGreetings = stompClient.subscribe(session, "/topic/greetings");
+		Subscription sGreetings = stompClient.subscribe(session, "/topic/greetings", "127.0.0.1");
 		
 		@SuppressWarnings("unused")
-		Subscription stateCpu = stompClient.subscribe(session, "/status/system");
+		Subscription stateCpu = stompClient.subscribe(session, "/status/system", "127.0.0.1");
 
 	
 	}

@@ -1,0 +1,86 @@
+.body {
+	font: 16px courier, sans-serif;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.hidden {
+	visibility: hidden;
+}
+
+.white-space-pre {
+	white-space: pre-wrap;
+}
+
+.lightRed {
+	background-color: red;
+	color: white;
+}
+
+.lightYellow {
+	background-color: yellow;
+	color: black;
+}
+
+.lightGreen {
+	background-color: green;
+	color: white;
+}
+
+.lightInactive {
+	background-color: gray;
+	color: white;
+}
+
+.circle {
+	position: relative;
+	width: 120px;
+	height: 120px;
+	border: 1px solid black;
+	text-align: center;
+	border-radius: 150px;
+	vertical-align: middle;
+}
+
+.lightTitle {
+	padding-bottom: 10px;
+}
+
+.lightValue {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.lightValue {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.table {
+	display: table;
+	margin: 5px;
+	padding: 5px;
+}
+
+.row {
+	display: table-row;
+}
+
+.cell {
+	display: table-cell;
+	/* 	width: 150px; */
+	/* 	height: 150px; */
+	border: 1px solid black;
+	padding: 5px;
+}
+
+.cellSimple {
+	display: table-cell;
+}
+
+.cellValue {
+	font-size: 12px;
+	font-weight: bold;
+}
