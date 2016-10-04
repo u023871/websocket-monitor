@@ -10,19 +10,16 @@ import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSession.Subscription;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import de.phigroup.websocket.client.SpringWebSocketStompMessageBroker;
 import de.phigroup.websocket.client.SpringWebSocketStompMessageSubscriber;
-import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @ComponentScan({"de.phigroup"}) // http://www.baeldung.com/spring-nosuchbeandefinitionexception
 @SpringBootApplication
 @EnableAsync
 @EnableScheduling
-@Slf4j
 public class Application implements CommandLineRunner {
 
 	@Autowired
@@ -30,6 +27,9 @@ public class Application implements CommandLineRunner {
 	
 	@Autowired
 	private SpringWebSocketStompMessageSubscriber stompSubscriber;
+	
+	@Autowired
+	private MonitoringController monitoringController;
 
 	public static void main(String[] args) {
 		
@@ -47,6 +47,10 @@ public class Application implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
+		//
+		// TODO: following is only an example implementation for subscription via Java... does not make sense so far for the monitoring webapp...
+		//
+		
 		ListenableFuture<StompSession> session = stompBroker.connectStompSession("ws://127.0.0.1:9090/monitor/hello");
 		
 		@SuppressWarnings("unused")
@@ -55,44 +59,7 @@ public class Application implements CommandLineRunner {
 		@SuppressWarnings("unused")
 		Subscription stateCpu = stompSubscriber.subscribe(session, "/status/system", "127.0.0.1");
 
-		sendStatic();
+		monitoringController.sendStatic();
 		
 	}
-	
-	/**
-	 * send out data to subscribers every 10s
-	 * 
-     * TODO: let iteration be set by UI in next step
-     * TODO: read ws endpoint and source host from some configuration
-	 */
-	@Scheduled(cron="*/10 * * * * *")
-	public void sendDynamic() {
-
-		try {
-			stompBroker.sendDynamicSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/dynamic", "127.0.0.1");
-
-			stompBroker.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "127.0.0.1");
-
-		} catch (Exception e) {
-
-			log.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
-	/**
-	 * send out static data to subscribers
-	 * 
-     * TODO: read ws endpoint and source host from some configuration
-	 */
-	public void sendStatic() {
-
-		try {
-			stompBroker.sendStaticSystemStatus("ws://127.0.0.1:9090/monitor/hello", "/status/system/static", "127.0.0.1");
-
-		} catch (Exception e) {
-
-			log.error(e.getLocalizedMessage(), e);
-		}
-	}
-	
 }

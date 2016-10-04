@@ -1,4 +1,4 @@
-package de.phigroup.websocket.monitor.jpa.repository;
+package de.phigroup.websocket.monitor.rest;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -13,7 +13,7 @@ import de.phigroup.websocket.monitor.jpa.entity.Host;
  *
  */
 @Configuration
-public class MyCoolConfiguration extends RepositoryRestMvcConfiguration {
+public class ConfigurationExtension extends RepositoryRestMvcConfiguration {
  
     @Override
     protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {

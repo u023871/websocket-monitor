@@ -73,7 +73,6 @@ public class SigarStaticSystemStats {
 		return SigarStaticSystemStats.instance;
 	}
 	
-	@JsonIgnore
 	public void fill() throws SigarException {
 
 		this.setStaticCpuInfo(fillStaticCpuInfo());

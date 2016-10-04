@@ -79,7 +79,6 @@ public class SigarDynamicSystemStats {
 		return stats;
 	}
 	
-	@JsonIgnore
 	public void fill() throws SigarException {
 
 		Mem mem = null;

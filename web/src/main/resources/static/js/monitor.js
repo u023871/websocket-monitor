@@ -78,6 +78,25 @@
 	};
 	
 	/**
+	 * load hosts on load
+	 */
+	function triggerSendFullStatus(host) {
+		
+		var status = null;
+		
+	    $.ajax({
+	        type: "POST",
+	        url: host.url + "/monitoring/sendStatus",
+	        async: false,
+	        success : function(data) {
+	            status = data;
+	        }
+	    });
+
+	    return status;
+	};
+	
+	/**
 	 * set status to dis/connected
 	 */
 	function setConnected(connected) {
@@ -125,6 +144,9 @@
 			};
 			*/
 			
+			//
+			// make websocket subscriptions
+			//
 			stompClient.connect({}, function(frame) {
 				
 				setConnected(true);
@@ -162,8 +184,14 @@
 					
 					dynCpuStatsWritten = true;
 				});
+
+				
+				//
+				// initialize monitoring page for active host using a REST service of this source host;
+				// must be here in connect method (after it it would be executed async. and too early, i.e. before connect/subscription has finished)
+				//
+				triggerSendFullStatus(host);
 			});
-			
 			
 		}
 	}
