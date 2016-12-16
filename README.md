@@ -2,7 +2,7 @@
 Spring boot/websocket/integration and JQuery/SockJS based monitoring web application
 
 * Run web as Spring Boot app
-* Run sender as Spring Boot app
+* Run sender as Spring Boot app (web must be 1st or connect from browser client will fail!)
 * open http://localhost:9090/monitor
 * run SpringWebSocketStompClientTest (make sure correct java.library.path for Sigar is set) and watch sender Application and index.html receiving content sent by this JUnit test
 
