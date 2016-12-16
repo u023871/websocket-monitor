@@ -87,8 +87,8 @@
 	    $.ajax({
 	        type: "POST",
 	        url: host.url + "/monitoring/sendStatus/" + host.ip,
-	        async: false,
-	        crossDomain: false,
+	        async: true,
+	        crossDomain: true,
 	        success : function(data) {
 	            status = data;
 	        }

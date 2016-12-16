@@ -25,7 +25,12 @@ public class Host {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
+	/** name of monitored host */
 	String name;
+	
+	/** IP suffix of a subscribed message channel */
 	String ip;
+	
+	/** the REST endpoint of sender (!) application prefix for triggering sending data to all subscribers of a channel */
 	String url;
 }
