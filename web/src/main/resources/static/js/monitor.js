@@ -86,8 +86,9 @@
 		
 	    $.ajax({
 	        type: "POST",
-	        url: host.url + "/monitoring/sendStatus",
+	        url: host.url + "/monitoring/sendStatus/" + host.ip,
 	        async: false,
+	        crossDomain: false,
 	        success : function(data) {
 	            status = data;
 	        }
@@ -133,7 +134,7 @@
 			setCurrentHost(host);
 			
  			// var socket = new SockJS('/hello');
-			var socket = new SockJS('http://192.168.1.43:9090/monitor/hello');
+			var socket = new SockJS('http://localhost:9090/monitor/hello');
 			stompClient = Stomp.over(socket);
 			
 			/* enable Stomp client debugging by uncommenting

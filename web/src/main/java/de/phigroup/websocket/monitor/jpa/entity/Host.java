@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import lombok.Data;
 
 /**
- * Fill like HTTP POST to http://localhost:9090/hosts with payload {"ip":"127.0.0.1","name":"ROCKIT","url":"http://localhost:9090/"}
+ * Fill like HTTP POST to http://localhost:9090/monitor/hosts with payload {"ip":"127.0.0.1","name":"ROCKIT","url":"http://localhost:7070"}
  * 
  * See https://spring.io/guides/gs/accessing-data-rest/.
  * 

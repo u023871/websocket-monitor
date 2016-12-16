@@ -32,6 +32,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 		// you can register hosts allowed to connect to our web sockets with setAllowedOrigins
 		// TODO: encapsulate into properties or DB
 		registry.addEndpoint("/hello").setAllowedOrigins("*").withSockJS();
+//		registry.addEndpoint("/**").setAllowedOrigins("*");
 	}
 
 }

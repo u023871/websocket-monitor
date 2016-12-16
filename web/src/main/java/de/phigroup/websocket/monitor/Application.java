@@ -3,8 +3,12 @@ package de.phigroup.websocket.monitor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 
 // disable security: http://stackoverflow.com/questions/23894010/spring-boot-security-disable-security
@@ -18,4 +22,26 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
+    
+    
+//    /**
+//     * TODO: 20161215: access from non-localhost
+//     * "XMLHttpRequest cannot load http://localhost:9090/monitor/hosts. No 
+//     * 'Access-Control-Allow-Origin' header is present on the requested resource. 
+//     * Origin 'http://wu17035962-lsy.ads.dlh.de:9090' is therefore not allowed access."
+//     * only a try... https://spring.io/guides/gs/rest-service-cors/
+//     * @return
+//     */
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurerAdapter() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**").allowedOrigins("*");
+////                registry.addMapping("/hosts").allowedOrigins(
+////                		"http://localhost:9090", 
+////                		"http://wu17035962-lsy.ads.dlh.de:9090");
+//            }
+//        };
+//    }
 }

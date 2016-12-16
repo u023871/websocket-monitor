@@ -1,6 +1,6 @@
 #DROP DATABASE IF EXISTS monitor;
 
-#CREATE DATABASE monitor;
+CREATE DATABASE `monitor` CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 SELECT PASSWORD('quake');
 

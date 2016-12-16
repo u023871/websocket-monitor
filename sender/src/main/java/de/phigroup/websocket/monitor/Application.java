@@ -39,7 +39,7 @@ public class Application implements CommandLineRunner {
 		 * 
 		 * TODO: set to classpath or so to make it dynamic
 		 */
-		System.setProperty("java.library.path", "C:\\development\\Workspaces\\Spring\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
+		System.setProperty("java.library.path", "D:\\DEV\\Workspaces\\u023871\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
 		
 		SpringApplication.run(Application.class, args);
 	}
@@ -59,7 +59,7 @@ public class Application implements CommandLineRunner {
 		@SuppressWarnings("unused")
 		Subscription stateCpu = stompSubscriber.subscribe(session, "/status/system", "127.0.0.1");
 
-		monitoringController.sendStatic();
+		monitoringController.sendStatic("127.0.0.1");
 		
 	}
 }

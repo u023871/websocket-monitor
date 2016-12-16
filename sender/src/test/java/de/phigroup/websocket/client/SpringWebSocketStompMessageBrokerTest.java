@@ -48,7 +48,7 @@ public class SpringWebSocketStompMessageBrokerTest {
 		 * Test Sigar stuff with -Djava.library.path="D:\DEV\Workspaces\Spring\gs-messaging-stomp-websocket\stomp-websocket-client\src\main\resources\sigar\lib",
 		 * see http://stackoverflow.com/questions/11612711/sigar-unsatisfiedlinkerror!
 		 */
-		System.setProperty("java.library.path", "C:\\development\\Workspaces\\Spring\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
+		System.setProperty("java.library.path", "D:\\DEV\\Workspaces\\u023871\\websocket-monitor\\sender\\src\\main\\resources\\sigar\\lib");
 	}
 	
 	/**
