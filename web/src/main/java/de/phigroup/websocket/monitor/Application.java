@@ -3,12 +3,10 @@ package de.phigroup.websocket.monitor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 
 // disable security: http://stackoverflow.com/questions/23894010/spring-boot-security-disable-security
@@ -17,9 +15,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 @ComponentScan({"de.phigroup"}) // http://www.baeldung.com/spring-nosuchbeandefinitionexception
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
+	/**
+	 * Override this method of SpringBootServletInitializer or application won't startup as war deployment.
+	 * See cpt. 81.1 in http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file.
+	 */
+    @Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+
+    	return builder.sources(Application.class);
+	}
+
+	public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
     

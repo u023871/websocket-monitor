@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -20,7 +22,7 @@ import de.phigroup.websocket.client.SpringWebSocketStompMessageSubscriber;
 @SpringBootApplication
 @EnableAsync
 @EnableScheduling
-public class Application implements CommandLineRunner {
+public class Application extends SpringBootServletInitializer implements CommandLineRunner {
 
 	@Autowired
 	private SpringWebSocketStompMessageBroker stompBroker;
@@ -31,7 +33,17 @@ public class Application implements CommandLineRunner {
 	@Autowired
 	private MonitoringController monitoringController;
 
-	public static void main(String[] args) {
+	/**
+	 * Override this method of SpringBootServletInitializer or application won't startup as war deployment.
+	 * See cpt. 81.1 in http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file.
+	 */
+    @Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+
+    	return builder.sources(Application.class);
+	}
+    
+    public static void main(String[] args) {
 		
 		/*
 		 * Test Sigar stuff with -Djava.library.path="D:\DEV\Workspaces\Spring\gs-messaging-stomp-websocket\stomp-websocket-client\src\main\resources\sigar\lib",
