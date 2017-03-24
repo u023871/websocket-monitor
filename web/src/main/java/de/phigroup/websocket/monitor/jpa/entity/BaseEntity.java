@@ -43,8 +43,5 @@ public abstract class BaseEntity {
     @LastModifiedBy
     private String lastUpdatedBy;
 
-    // see JpaEntityStatus
-    @Column(name = "status")
-    private String status = JpaEntityStatus.ACTIVE.name();
     
 }
