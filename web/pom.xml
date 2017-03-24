@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.4.2.RELEASE</version>
+		<version>1.5.2.RELEASE</version>
 	</parent>
 
 
@@ -38,7 +38,7 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-messaging</artifactId>
 		</dependency>
-	
+
 		<!-- for building wars -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -97,7 +97,11 @@
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
 
-
+		<!-- entity auditing -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-envers</artifactId>
+		</dependency>
 	</dependencies>
 
 

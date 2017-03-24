@@ -7,16 +7,21 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+
+import de.phigroup.websocket.monitor.jpa.entity.PersistenceConfig;
 
 
 // disable security: http://stackoverflow.com/questions/23894010/spring-boot-security-disable-security
 @EnableAutoConfiguration(exclude = {
         org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class})
-@Configuration
+@Configuration()
 @ComponentScan({"de.phigroup"}) // http://www.baeldung.com/spring-nosuchbeandefinitionexception
 @SpringBootApplication
+//@Import({WebMvcContext.class, PersistenceContext.class})
+@Import({PersistenceConfig.class})
 public class Application extends SpringBootServletInitializer {
-
+    
 	/**
 	 * Override this method of SpringBootServletInitializer or application won't startup as war deployment.
 	 * See cpt. 81.1 in http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#howto-create-a-deployable-war-file.
